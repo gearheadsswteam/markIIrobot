@@ -1,20 +1,21 @@
 package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
+import static com.qualcomm.robotcore.util.Range.*;
 import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.classes.ProfileChain;
 import org.firstinspires.ftc.teamcode.classes.Robot;
 import org.firstinspires.ftc.teamcode.classes.TrapezoidalProfile;
 import org.firstinspires.ftc.teamcode.classes.ValueStorage;
 @TeleOp(name = "TeleOpRedBlue")
-public class TeleOpRedBlue extends LinearOpMode {
+public class TeleOpOneDriver extends LinearOpMode {
     Robot robot = new Robot();
     int state = 0;
     int holderDetectionCount = 0;
+    double increment = 0.005;
     double initialHeading = ValueStorage.lastPose.getHeading() - side * PI / 2;
     double robotHeading;
     double moveAngle;
@@ -104,17 +105,17 @@ public class TeleOpRedBlue extends LinearOpMode {
                             robot.gripper.setPosition(gripperRelease);
                         }
                     } else {
-                        if (gamepad1.right_trigger < 0.3) {
+                        if (gamepad1.right_trigger < 0.2) {
                             robot.setIntakePowers(1, 1);
-                        } else if (gamepad1.right_trigger < 0.7) {
+                        } else if (gamepad1.right_trigger < 0.8) {
                             robot.setIntakePowers(0, 0);
                         } else {
                             robot.setIntakePowers(-0.5, -0.5);
                         }
-                        if (gamepad1.left_trigger < 0.3) {
+                        if (gamepad1.left_trigger < 0.2) {
                             robot.roller.setPosition(rollerDown);
-                        } else if (gamepad1.left_trigger < 0.7) {
-                            robot.roller.setPosition((1.75 - 2.5 * gamepad1.left_trigger) * rollerDown + (2.5 * gamepad1.left_trigger - 0.75) * rollerUp);
+                        } else if (gamepad1.left_trigger < 0.8) {
+                            robot.roller.setPosition(scale(gamepad1.left_trigger, 0.2, 0.8, rollerDown, rollerUp));
                         } else {
                             robot.roller.setPosition(rollerUp);
                         }
@@ -139,37 +140,6 @@ public class TeleOpRedBlue extends LinearOpMode {
                 case 1:
                     if (time > stateTime) {
                         robot.setIntakePowers(0, 0);
-                        if (aPressed) {
-                            state = 2;
-                            robot.extendLiftProfile(time, liftLowClose[0], 0);
-                            robot.extendArmProfile(time, liftLowClose[1], 0);
-                            robot.extendWristProfile(time, liftLowClose[2], 0);
-                            stateTime = robot.restTime();
-                        } else if (bPressed) {
-                            state = 2;
-                            robot.extendLiftProfile(time, liftMedClose[0], 0);
-                            robot.extendArmProfile(time, liftMedClose[1], 0);
-                            robot.extendWristProfile(time, liftMedClose[2], 0);
-                            stateTime = robot.restTime();
-                        } else if (gamepad1.right_trigger > 0.2 && yPressed) {
-                            state = 2;
-                            robot.extendLiftProfile(time, liftHighFar[0], 0);
-                            robot.extendArmProfile(time, liftHighFar[1], 0);
-                            robot.extendWristProfile(time, liftHighFar[2], 0);
-                            stateTime = robot.restTime();
-                        } else if (yPressed) {
-                            state = 2;
-                            robot.extendLiftProfile(time, liftHighClose[0], 0);
-                            robot.extendArmProfile(time, liftHighClose[1], 0);
-                            robot.extendWristProfile(time, liftHighClose[2], 0);
-                            stateTime = robot.restTime();
-                        } else if (xPressed) {
-                            state = 2;
-                            robot.extendLiftProfile(time, liftGroundClose[0], 0);
-                            robot.extendArmProfile(time, liftGroundClose[1], 0);
-                            robot.extendWristProfile(time, liftGroundClose[2], 0);
-                            stateTime = robot.restTime();
-                        }
                         if (lbPressed) {
                             state = 0;
                             stateDir = false;
@@ -178,101 +148,108 @@ public class TeleOpRedBlue extends LinearOpMode {
                             stateTime = robot.armTime() + 0.25;
                             robot.roller.setPosition(rollerDown);
                         }
-                    } /*else if (robot.armProfile.getX(time) < armIn) {
-                        if (aPressed) {
-                            double upTime = robot.armTime();
-                            state = 2;
-                            robot.extendLiftProfile(time, liftLowClose[0], 0);
-                            robot.armProfile = new ProfileChain(robot.armProfile)
-                                    .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftLowClose[1], 0));
-                            robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                    .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftLowClose[2], 0));
-                            stateTime = robot.restTime();
-                        } else if (bPressed) {
-                            double upTime = robot.armTime();
-                            state = 2;
-                            robot.extendLiftProfile(time, liftMedClose[0], 0);
-                            robot.armProfile = new ProfileChain(robot.armProfile)
-                                    .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftMedClose[1], 0));
-                            robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                    .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftMedClose[2], 0));
-                            stateTime = robot.restTime();
-                        } else if (gamepad1.right_trigger > 0.2 && yPressed) {
-                            double upTime = robot.armTime();
-                            state = 2;
-                            robot.extendLiftProfile(time, liftHighFar[0], 0);
-                            robot.armProfile = new ProfileChain(robot.armProfile)
-                                    .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftHighFar[1], 0));
-                            robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                    .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftHighFar[2], 0));
-                            stateTime = robot.restTime();
-                        } else if (yPressed) {
-                         +   double upTime = robot.armTime();
-                            state = 2;
-                            robot.extendLiftProfile(time, liftHighClose[0], 0);
-                            robot.armProfile = new ProfileChain(robot.armProfile)
-                                    .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftHighClose[1], 0));
-                            robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                    .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftHighClose[2], 0));
-                            stateTime = robot.restTime();
-                        } else if (xPressed) {
-                            double upTime = robot.armTime();
-                            state = 2;
-                            robot.extendLiftProfile(time, liftGroundClose[0], 0);
-                            robot.armProfile = new ProfileChain(robot.armProfile)
-                                    .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftGroundClose[1], 0));
-                            robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                    .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftGroundClose[2], 0));
-                            stateTime = robot.restTime();
-                        }
-                    } */
-                    break;
-                case 2:
-                    if (time < stateTime) {} else if (aPressed) {
-                        robot.extendLiftProfile(time, liftLowClose[0], 0);
-                        robot.extendArmProfile(time, liftLowClose[1], 0);
-                        robot.extendWristProfile(time, liftLowClose[2], 0);
+                    }
+                    if (aPressed) {
+                        double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
+                        double upTime = max(time, stateTime);
+                        state = 2;
+                        robot.extendLiftProfile(readyTime, liftLowClose[0], 0);
+                        robot.armProfile = new ProfileChain(robot.armProfile)
+                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftLowClose[1], 0));
+                        robot.wristProfile = new ProfileChain(robot.wristProfile)
+                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftLowClose[2], 0));
                         stateTime = robot.restTime();
                     } else if (bPressed) {
-                        robot.extendLiftProfile(time, liftMedClose[0], 0);
-                        robot.extendArmProfile(time, liftMedClose[1], 0);
-                        robot.extendWristProfile(time, liftMedClose[2], 0);
+                        double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
+                        double upTime = max(time, stateTime);
+                        state = 2;
+                        robot.extendLiftProfile(readyTime, liftMedClose[0], 0);
+                        robot.armProfile = new ProfileChain(robot.armProfile)
+                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftMedClose[1], 0));
+                        robot.wristProfile = new ProfileChain(robot.wristProfile)
+                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftMedClose[2], 0));
                         stateTime = robot.restTime();
                     } else if (gamepad1.right_trigger > 0.2 && yPressed) {
-                        robot.extendLiftProfile(time, liftHighFar[0], 0);
-                        robot.extendArmProfile(time, liftHighFar[1], 0);
-                        robot.extendWristProfile(time, liftHighFar[2], 0);
+                        double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
+                        double upTime = max(time, stateTime);
+                        state = 2;
+                        robot.extendLiftProfile(readyTime, liftHighFar[0], 0);
+                        robot.armProfile = new ProfileChain(robot.armProfile)
+                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftHighFar[1], 0));
+                        robot.wristProfile = new ProfileChain(robot.wristProfile)
+                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftHighFar[2], 0));
                         stateTime = robot.restTime();
                     } else if (yPressed) {
-                        robot.extendLiftProfile(time, liftHighClose[0], 0);
-                        robot.extendArmProfile(time, liftHighClose[1], 0);
-                        robot.extendWristProfile(time, liftHighClose[2], 0);
+                        double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
+                        double upTime = max(time, stateTime);
+                        state = 2;
+                        robot.extendLiftProfile(readyTime, liftHighClose[0], 0);
+                        robot.armProfile = new ProfileChain(robot.armProfile)
+                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftHighClose[1], 0));
+                        robot.wristProfile = new ProfileChain(robot.wristProfile)
+                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftHighClose[2], 0));
                         stateTime = robot.restTime();
                     } else if (xPressed) {
-                        robot.extendLiftProfile(time, liftGroundClose[0], 0);
-                        robot.extendArmProfile(time, liftGroundClose[1], 0);
-                        robot.extendWristProfile(time, liftGroundClose[2], 0);
+                        double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
+                        double upTime = max(time, stateTime);
+                        state = 2;
+                        robot.extendLiftProfile(readyTime, liftGroundClose[0], 0);
+                        robot.armProfile = new ProfileChain(robot.armProfile)
+                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftGroundClose[1], 0));
+                        robot.wristProfile = new ProfileChain(robot.wristProfile)
+                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftGroundClose[2], 0));
                         stateTime = robot.restTime();
-                    } else if (rbPressed) {
-                        state = 3;
-                        stateDir = true;
-                        stateTime = 0.5;
-                        robot.gripper.setPosition(gripperRelease);
+                    }
+                    break;
+                case 2:
+                    if (time > stateTime) {
+                        if (aPressed) {
+                            robot.extendLiftProfile(time, liftLowClose[0], 0);
+                            robot.extendArmProfile(time, liftLowClose[1], 0);
+                            robot.extendWristProfile(time, liftLowClose[2], 0);
+                            stateTime = robot.restTime();
+                        } else if (bPressed) {
+                            robot.extendLiftProfile(time, liftMedClose[0], 0);
+                            robot.extendArmProfile(time, liftMedClose[1], 0);
+                            robot.extendWristProfile(time, liftMedClose[2], 0);
+                            stateTime = robot.restTime();
+                        } else if (gamepad1.right_trigger > 0.2 && yPressed) {
+                            robot.extendLiftProfile(time, liftHighFar[0], 0);
+                            robot.extendArmProfile(time, liftHighFar[1], 0);
+                            robot.extendWristProfile(time, liftHighFar[2], 0);
+                            stateTime = robot.restTime();
+                        } else if (yPressed) {
+                            robot.extendLiftProfile(time, liftHighClose[0], 0);
+                            robot.extendArmProfile(time, liftHighClose[1], 0);
+                            robot.extendWristProfile(time, liftHighClose[2], 0);
+                            stateTime = robot.restTime();
+                        } else if (xPressed) {
+                            robot.extendLiftProfile(time, liftGroundClose[0], 0);
+                            robot.extendArmProfile(time, liftGroundClose[1], 0);
+                            robot.extendWristProfile(time, liftGroundClose[2], 0);
+                            stateTime = robot.restTime();
+                        } else if (rbPressed) {
+                            state = 3;
+                            stateDir = true;
+                            stateTime = time + 0.5;
+                            robot.gripper.setPosition(gripperRelease);
+                        }
                     }
                     break;
                 case 3:
-                    if (time < stateTime) {
-                    } else if (rbPressed) {
-                        state = 4;
-                        robot.extendLiftProfile(time, 0, 0);
-                        robot.extendArmProfile(time, armIn, 0);
-                        robot.extendWristProfile(time, wristIn, 0);
-                        stateTime = robot.restTime();
-                    } else if (lbPressed) {
-                        state = 2;
-                        stateDir = false;
-                        stateTime = 0.5;
-                        robot.gripper.setPosition(gripperHold);
+                    if (time > stateTime) {
+                        if (rbPressed) {
+                            state = 4;
+                            robot.extendLiftProfile(time, 0, 0);
+                            robot.extendArmProfile(time, armIn, 0);
+                            robot.extendWristProfile(time, wristIn, 0);
+                            stateTime = robot.restTime();
+                        } else if (lbPressed) {
+                            state = 2;
+                            stateDir = false;
+                            stateTime = time + 0.5;
+                            robot.gripper.setPosition(gripperHold);
+                        }
                     }
                     break;
                 case 4:
@@ -302,22 +279,26 @@ public class TeleOpRedBlue extends LinearOpMode {
                     break;
             }
             if (gamepad1.dpad_up && (state == 2 || state == 3) && time > stateTime) {
-                //robot.extendLiftProfile(time, adjustUp(robot.liftProfile.getX(time)), 0);
+                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), increment)[0], 0);
+                robot.extendArmProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), increment)[1], 0);
+                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), increment)[2], 0);
             } else if (gamepad1.dpad_down && (state == 2 || state == 3) && time > stateTime) {
-                //robot.extendLiftProfile(time, adjustDown(robot.liftProfile.getX(time)), 0);
+                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), -increment)[0], 0);
+                robot.extendArmProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), -increment)[1], 0);
+                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), -increment)[2], 0);
             }
             robot.update(time);
             robotHeading = robot.getHeading() + initialHeading;
             moveAngle = atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) - robotHeading;
-            moveMagnitude = abs(pow(gamepad1.left_stick_x, 3)) + abs(pow(gamepad1.left_stick_y, 3));
+            moveMagnitude = pow(pow(gamepad1.left_stick_x, 2) + pow(gamepad1.left_stick_y, 2), 1.5);
             if (moveMagnitude < 0.01) {
                 moveMagnitude = 0;
             }
             turn = pow(gamepad1.right_stick_x, 3);
-            robot.setDrivePowers(moveMagnitude * Range.clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) + turn,
-                    moveMagnitude * Range.clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)), -1, 1) - turn,
-                    moveMagnitude * Range.clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)), -1, 1) + turn,
-                    moveMagnitude * Range.clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) - turn);
+            robot.setDrivePowers(moveMagnitude * clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) + turn,
+                    moveMagnitude * clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)), -1, 1) - turn,
+                    moveMagnitude * clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)), -1, 1) + turn,
+                    moveMagnitude * clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) - turn);
         }
     }
 }

@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-@Autonomous(name = "LeftPark-Neutral", group = "Left")
-public class AutonomousBlueLeftParkNeutral extends AbstractAutonomous {
+@Autonomous(name = "LeftParkNeutral", group = "Left")
+public class AutonomousLeftParkNeutral extends AbstractAutonomous {
     Pose2d dropPose = new Pose2d(33, 20, -2.05);
     Pose2d[] parkPose = new Pose2d[] {new Pose2d(59, 34, -PI / 2), new Pose2d(35, 34, -PI / 2), new Pose2d(11, 34, -PI / 2)};
     TrajectorySequence traj1;

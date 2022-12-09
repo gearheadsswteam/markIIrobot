@@ -12,14 +12,12 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Mat;
 import java.util.ArrayList;
 public class ColorSignalDetectorPipeline extends OpenCvPipeline {
+    int caseDetected = 0;
     Mat process = new Mat();
-    Mat output = new Mat();
     ArrayList<MatOfPoint> contours;
     Point[] contourArr;
-    int caseDetected = 0;
     @Override
     public Mat processFrame(Mat input) {
-        output = input.clone();
         contours = new ArrayList<>();
         int[] maxColor = {0, -1};
         for (int i = 0; i < signalLower.length; i++) {
@@ -30,7 +28,7 @@ public class ColorSignalDetectorPipeline extends OpenCvPipeline {
             Imgproc.morphologyEx(process, process, Imgproc.MORPH_CLOSE, new Mat());
             Imgproc.GaussianBlur(process, process, new Size(15, 5), 0);
             Imgproc.findContours(process, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-            Imgproc.drawContours(output, contours, -1, new Scalar(0, 0, 0));
+            Imgproc.drawContours(input, contours, -1, new Scalar(0, 0, 0));
             for (MatOfPoint contour : contours) {
                 contourArr = contour.toArray();
                 Rect boundingRect = Imgproc.boundingRect(new MatOfPoint2f(contourArr));
@@ -41,21 +39,20 @@ public class ColorSignalDetectorPipeline extends OpenCvPipeline {
             if (maxRect.area() > maxColor[0]) {
                 maxColor = new int[] {(int) maxRect.area(), i};
             }
-            Imgproc.rectangle(output, maxRect, new Scalar(255, 255, 255));
-            Imgproc.putText(output, "Color "+ (i + 1) + " Area: " + maxRect.area(), new Point(10, 20 + 15 * i), 0, 0.5, new Scalar(0, 0, 255), 1);
+            Imgproc.rectangle(input, maxRect, new Scalar(255, 255, 255));
+            Imgproc.putText(input, "Color "+ (i + 1) + " Area: " + maxRect.area(), new Point(10, 20 + 15 * i), 0, 0.5, new Scalar(100, 100, 255), 1);
 
         }
         caseDetected = maxColor[1] + 1;
         if (caseDetected == 0) {
-            Imgproc.putText(output, "Signal not detected", new Point(10, 350), 0, 0.5, new Scalar(0, 0, 255), 1);
+            Imgproc.putText(input, "Signal not detected", new Point(10, 350), 0, 0.5, new Scalar(100, 100, 255), 1);
         } else {
-            Imgproc.putText(output, "Case: " + caseDetected, new Point(10, 350), 0, 0.5, new Scalar(0, 0, 255), 1);
+            Imgproc.putText(input, "Case: " + caseDetected, new Point(10, 350), 0, 0.5, new Scalar(100, 100, 255), 1);
         }
-        return output;
+        return input;
     }
     public void end() {
         process.release();
-        output.release();
     }
     public int getCaseDetected() {
         return caseDetected;
