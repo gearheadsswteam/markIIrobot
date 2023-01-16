@@ -16,12 +16,8 @@ public class AutonomousRightParkNeutral extends AbstractAutonomous {
     TrajectorySequence[] traj2;
     ElapsedTime clock = new ElapsedTime();
     double time = 0;
-    double traj1Time = 1000;
     double retractTime = 1000;
     double doneTime = 1000;
-    boolean startLift = false;
-    boolean endTraj1 = false;
-    boolean traj1Done = false;
     boolean traj2Done = false;
     boolean retractDone = true;
     @Override
@@ -31,14 +27,22 @@ public class AutonomousRightParkNeutral extends AbstractAutonomous {
                 .splineTo(new Vector2d(-35, 30), -PI / 2)
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(25))
                 .splineTo(dropPose.vec(), dropPose.getHeading())
+                .waitSeconds(1)
                 .resetConstraints()
-                .addTemporalMarker(1, -1.6, () -> {
-                    startLift = true;
+                .addTemporalMarker(1, -2.6, () -> {
+                    robot.extendLiftProfile(time, liftHighClose[0], 0);
+                    robot.extendArmProfile(time, liftHighClose[1], 0);
+                    robot.extendWristProfile(time, liftHighClose[2], 0);
+                })
+                .addTemporalMarker(1, -1, () -> {
+                    robot.gripper.setPosition(gripperRelease);
                 })
                 .addTemporalMarker(1, 0, () -> {
-                    endTraj1 = true;
-                    traj1Done = true;
-                    traj1Time = clock.seconds();
+                    robot.drive.followTrajectorySequenceAsync(traj2[runCase - 1]);
+                    robot.extendLiftProfile(time, 0, 0);
+                    robot.extendArmProfile(time, armIn, 0);
+                    robot.extendWristProfile(time, wristIn, 0);
+                    retractTime = robot.restTime();
                 }).build();
             traj2 = new TrajectorySequence[] {
                     robot.drive.trajectorySequenceBuilder(dropPose)
@@ -71,24 +75,6 @@ public class AutonomousRightParkNeutral extends AbstractAutonomous {
         robot.drive.followTrajectorySequenceAsync(traj1);
         while(opModeIsActive() && !isStopRequested() && (!traj2Done || time < doneTime)) {
             time = clock.seconds();
-            if (startLift) {
-                robot.extendLiftProfile(time, liftHighClose[0], 0);
-                robot.extendArmProfile(time, liftHighClose[1], 0);
-                robot.extendWristProfile(time, liftHighClose[2], 0);
-                startLift = false;
-            }
-            if (endTraj1) {
-                robot.gripper.setPosition(gripperRelease);
-                endTraj1 = false;
-            }
-            if (traj1Done && time - traj1Time > 1) {
-                robot.drive.followTrajectorySequenceAsync(traj2[runCase - 1]);
-                robot.extendLiftProfile(time, 0, 0);
-                robot.extendArmProfile(time, armIn, 0);
-                robot.extendWristProfile(time, wristIn, 0);
-                retractTime = robot.restTime();
-                traj1Done = false;
-            }
             if (retractDone && time > retractTime) {
                 robot.armProfile = forwardArmProfile2(time);
                 robot.wristProfile = forwardWristProfile2(time);

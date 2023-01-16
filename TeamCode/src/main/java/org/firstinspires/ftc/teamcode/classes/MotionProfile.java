@@ -9,22 +9,23 @@ public abstract class MotionProfile {
     double vf;
     public abstract double getX(double t);
     public abstract double getV(double t);
+    public abstract double getA(double t);
     public double getTf() {
         return tf;
     }
     public double getTi() {
         return ti;
     }
-    public TrapezoidalProfile extendTrapezoidal(double vm, double am, double t, double xf, double vf) {
-        return new TrapezoidalProfile(vm, am, t, getX(t), getV(t), xf, vf);
+    public TrapezoidalProfile extendTrapezoidal(double vMax, double aMax, double t, double xFinal, double vFinal) {
+        return new TrapezoidalProfile(vMax, aMax, t, getX(t), getV(t), xFinal, vFinal);
     }
-    public TrapezoidalProfile extendTrapezoidal(double vm, double am, double xf, double vf) {
-        return extendTrapezoidal(vm, am, getTf(), xf, vf);
+    public TrapezoidalProfile extendTrapezoidal(double vMax, double aMax, double xFinal, double vFinal) {
+        return extendTrapezoidal(vMax, aMax, tf, xFinal, vFinal);
     }
-    public DelayProfile extendDelay(double t, double tFinal) {
-        return new DelayProfile(t, getX(t), getV(t), tFinal);
+    public DelayProfile extendDelay(double t, double dt) {
+        return new DelayProfile(t, getX(t), getV(t), dt);
     }
-    public DelayProfile extendDelay(double tFinal) {
-        return extendDelay(tf, tFinal);
+    public DelayProfile extendDelay(double dt) {
+        return extendDelay(tf, dt);
     }
 }

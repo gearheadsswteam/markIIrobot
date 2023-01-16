@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
 import static com.qualcomm.robotcore.util.Range.*;
 import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,7 +13,7 @@ import org.firstinspires.ftc.teamcode.classes.ProfileChain;
 import org.firstinspires.ftc.teamcode.classes.Robot;
 import org.firstinspires.ftc.teamcode.classes.TrapezoidalProfile;
 import org.firstinspires.ftc.teamcode.classes.ValueStorage;
-@TeleOp(name = "TeleOpRedBlue")
+@TeleOp(name = "TeleOpOneDriver")
 public class TeleOpOneDriver extends LinearOpMode {
     Robot robot = new Robot();
     int state = 0;
@@ -39,6 +42,7 @@ public class TeleOpOneDriver extends LinearOpMode {
     ElapsedTime clock = new ElapsedTime();
     @Override
     public void runOpMode() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         robot.init(hardwareMap, armRest, wristRest);
         robot.gripper.setPosition(gripperRelease);
         robot.retract.setPosition(odoUp);
@@ -154,51 +158,56 @@ public class TeleOpOneDriver extends LinearOpMode {
                         double upTime = max(time, stateTime);
                         state = 2;
                         robot.extendLiftProfile(readyTime, liftLowClose[0], 0);
-                        robot.armProfile = new ProfileChain(robot.armProfile)
-                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftLowClose[1], 0));
-                        robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftLowClose[2], 0));
+                        robot.armProfile = ((ProfileChain) robot.armProfile)
+                                .addExtendTrapezoidal(armMaxVel, armMaxAccel, upTime, liftLowClose[1], 0);
+                        robot.wristProfile = ((ProfileChain) robot.wristProfile)
+                                .addExtendTrapezoidal(wristMaxVel, wristMaxAccel, upTime, liftLowClose[2], 0);
                         stateTime = robot.restTime();
+                        robot.setIntakePowers(0, 0);
                     } else if (bPressed) {
                         double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
                         double upTime = max(time, stateTime);
                         state = 2;
                         robot.extendLiftProfile(readyTime, liftMedClose[0], 0);
-                        robot.armProfile = new ProfileChain(robot.armProfile)
-                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftMedClose[1], 0));
-                        robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftMedClose[2], 0));
+                        robot.armProfile = ((ProfileChain) robot.armProfile)
+                                .addExtendTrapezoidal(armMaxVel, armMaxAccel, upTime, liftMedClose[1], 0);
+                        robot.wristProfile = ((ProfileChain) robot.wristProfile)
+                                .addExtendTrapezoidal(wristMaxVel, wristMaxAccel, upTime, liftMedClose[2], 0);
                         stateTime = robot.restTime();
+                        robot.setIntakePowers(0, 0);
                     } else if (gamepad1.right_trigger > 0.2 && yPressed) {
                         double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
                         double upTime = max(time, stateTime);
                         state = 2;
                         robot.extendLiftProfile(readyTime, liftHighFar[0], 0);
-                        robot.armProfile = new ProfileChain(robot.armProfile)
-                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftHighFar[1], 0));
-                        robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftHighFar[2], 0));
+                        robot.armProfile = ((ProfileChain) robot.armProfile)
+                                .addExtendTrapezoidal(armMaxVel, armMaxAccel, upTime, liftHighFar[1], 0);
+                        robot.wristProfile = ((ProfileChain) robot.wristProfile)
+                                .addExtendTrapezoidal(wristMaxVel, wristMaxAccel, upTime, liftHighFar[2], 0);
                         stateTime = robot.restTime();
+                        robot.setIntakePowers(0, 0);
                     } else if (yPressed) {
                         double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
                         double upTime = max(time, stateTime);
                         state = 2;
                         robot.extendLiftProfile(readyTime, liftHighClose[0], 0);
-                        robot.armProfile = new ProfileChain(robot.armProfile)
-                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftHighClose[1], 0));
-                        robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftHighClose[2], 0));
+                        robot.armProfile = ((ProfileChain) robot.armProfile)
+                                .addExtendTrapezoidal(armMaxVel, armMaxAccel, upTime, liftHighClose[1], 0);
+                        robot.wristProfile = ((ProfileChain) robot.wristProfile)
+                                .addExtendTrapezoidal(wristMaxVel, wristMaxAccel, upTime, liftHighClose[2], 0);
                         stateTime = robot.restTime();
+                        robot.setIntakePowers(0, 0);
                     } else if (xPressed) {
                         double readyTime = max(time, ((ProfileChain) robot.armProfile).getProfiles().get(0).getTf());
                         double upTime = max(time, stateTime);
                         state = 2;
                         robot.extendLiftProfile(readyTime, liftGroundClose[0], 0);
-                        robot.armProfile = new ProfileChain(robot.armProfile)
-                                .add(new TrapezoidalProfile(armMaxVel, armMaxAccel, upTime, armUp, 0, liftGroundClose[1], 0));
-                        robot.wristProfile = new ProfileChain(robot.wristProfile)
-                                .add(new TrapezoidalProfile(wristMaxVel, wristMaxAccel, upTime, wristUp, 0, liftGroundClose[2], 0));
+                        robot.armProfile = ((ProfileChain) robot.armProfile)
+                                .addExtendTrapezoidal(armMaxVel, armMaxAccel, upTime, liftGroundClose[1], 0);
+                        robot.wristProfile = ((ProfileChain) robot.wristProfile)
+                                .addExtendTrapezoidal(wristMaxVel, wristMaxAccel, upTime, liftGroundClose[2], 0);
                         stateTime = robot.restTime();
+                        robot.setIntakePowers(0, 0);
                     }
                     break;
                 case 2:
@@ -279,16 +288,16 @@ public class TeleOpOneDriver extends LinearOpMode {
                     break;
             }
             if (gamepad1.dpad_up && (state == 2 || state == 3) && time > stateTime) {
-                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), increment)[0], 0);
-                robot.extendArmProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), increment)[1], 0);
-                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), increment)[2], 0);
+                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), increment)[0], 0);
+                robot.extendArmProfile(time, adjust(robot.liftProfile.getX(time), increment)[1], 0);
+                robot.extendWristProfile(time, adjust(robot.liftProfile.getX(time), increment)[2], 0);
             } else if (gamepad1.dpad_down && (state == 2 || state == 3) && time > stateTime) {
-                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), -increment)[0], 0);
-                robot.extendArmProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), -increment)[1], 0);
-                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), robot.armProfile.getX(time), -increment)[2], 0);
+                robot.extendLiftProfile(time, adjust(robot.liftProfile.getX(time), -increment)[0], 0);
+                robot.extendArmProfile(time, adjust(robot.liftProfile.getX(time), -increment)[1], 0);
+                robot.extendWristProfile(time, adjust(robot.liftProfile.getX(time), -increment)[2], 0);
             }
             robot.update(time);
-            robotHeading = robot.getHeading() + initialHeading;
+            robotHeading = robot.heading() + initialHeading;
             moveAngle = atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) - robotHeading;
             moveMagnitude = pow(pow(gamepad1.left_stick_x, 2) + pow(gamepad1.left_stick_y, 2), 1.5);
             if (moveMagnitude < 0.01) {

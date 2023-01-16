@@ -6,7 +6,7 @@ public class TrapezoidalProfile extends MotionProfile {
     boolean flat;
     public TrapezoidalProfile(double vm, double am, double ti, double xi, double vi, double xf, double vf) {
         this.vm = vm;
-        this.xi = xi;
+        this.xi = xi;       
         this.vi = vi;
         this.ti = ti;
         this.xf = xf;
@@ -101,6 +101,44 @@ public class TrapezoidalProfile extends MotionProfile {
             }
         } else {
             return vf;
+        }
+    }
+    @Override
+    public double getA(double t) {
+        if (t < 0) {
+            return vi;
+        } else if (t < tf) {
+            if (xf > xi && flat) {
+                if (t < ti + (vm - vi) / am) {
+                    return am;
+                } else if (t < tf - vm / am) {
+                    return 0;
+                } else {
+                    return -am;
+                }
+            } else if (xf > xi) {
+                if (t < (tf + ti) / 2 + (vf - vi) / (2 * am)) {
+                    return am;
+                } else {
+                    return -am;
+                }
+            } else if (flat) {
+                if (t < ti + (vm + vi) / am) {
+                    return -am;
+                } else if (t < tf - vm / am) {
+                    return 0;
+                } else {
+                    return am;
+                }
+            } else {
+                if (t < (tf + ti) / 2 + (vi - vf) / (2 * am)) {
+                    return -am;
+                } else {
+                    return am;
+                }
+            }
+        } else {
+            return 0;
         }
     }
     public TrapezoidalProfile extendTrapezoidal(double t, double xFinal, double vFinal) {

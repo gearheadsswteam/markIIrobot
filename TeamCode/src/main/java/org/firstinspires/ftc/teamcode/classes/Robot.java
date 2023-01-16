@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.classes;
 import static java.lang.Math.*;
 import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,7 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import java.util.List;
 public class Robot {
     public SampleMecanumDrive drive;
     public DcMotorEx fl;
@@ -37,7 +35,6 @@ public class Robot {
     public Servo wristR;
     public RevColorSensorV3 holder;
     public IMU gyro;
-    List<LynxModule> allHubs;
     PidfController liftPidf = new PidfController(liftKp, liftKi, liftKd) {
         @Override
         public double kf(double input) {
@@ -68,7 +65,6 @@ public class Robot {
         wristR = hwMap.get(Servo.class, "wristR");
         holder = hwMap.get(RevColorSensorV3.class, "holder");
         gyro = hwMap.get(IMU.class, "gyro");
-        allHubs = hwMap.getAll(LynxModule.class);
         fl.setDirection(DcMotorSimple.Direction.REVERSE);
         bl.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeR.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -78,16 +74,13 @@ public class Robot {
         liftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armProfile = new TrapezoidalProfile(armMaxVel, armMaxAccel, 0, armPos, 0, armPos, 0);
         wristProfile = new TrapezoidalProfile(wristMaxVel, wristMaxAccel, 0, wristPos, 0, wristPos, 0);
-        for (LynxModule hub: allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
         PhotonCore.enable();
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         gyro.initialize(parameters);
     }
-    public double getHeading() {
+    public double heading() {
         return gyro.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
     }
     public double restTime() {
