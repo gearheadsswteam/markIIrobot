@@ -21,6 +21,7 @@ public class ColorSignalDetectorPipeline extends OpenCvPipeline {
         contours = new ArrayList<>();
         int[] maxColor = {0, -1};
         for (int i = 0; i < signalLower.length; i++) {
+            contours = new ArrayList<>();
             Rect maxRect = new Rect();
             Imgproc.cvtColor(input, process, Imgproc.COLOR_RGB2YCrCb);
             Core.inRange(process, signalLower[i], signalUpper[i], process);
@@ -40,14 +41,14 @@ public class ColorSignalDetectorPipeline extends OpenCvPipeline {
                 maxColor = new int[] {(int) maxRect.area(), i};
             }
             Imgproc.rectangle(input, maxRect, new Scalar(255, 255, 255));
-            Imgproc.putText(input, "Color "+ (i + 1) + " Area: " + maxRect.area(), new Point(10, 20 + 15 * i), 0, 0.5, new Scalar(100, 100, 255), 1);
+            Imgproc.putText(input, "Color "+ (i + 1) + " Area: " + maxRect.area(), new Point(10, 25 + 30 * i), 0, 0.7, new Scalar(100, 100, 255), 2);
 
         }
         caseDetected = maxColor[1] + 1;
         if (caseDetected == 0) {
-            Imgproc.putText(input, "Signal not detected", new Point(10, 350), 0, 0.5, new Scalar(100, 100, 255), 1);
+            Imgproc.putText(input, "No Signal Detected", new Point(10, 465), 0, 0.7, new Scalar(100, 100, 255), 2);
         } else {
-            Imgproc.putText(input, "Case: " + caseDetected, new Point(10, 350), 0, 0.5, new Scalar(100, 100, 255), 1);
+            Imgproc.putText(input, "Case: " + caseDetected, new Point(10, 465), 0, 0.7, new Scalar(100, 100, 255), 2);
         }
         return input;
     }
