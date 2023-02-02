@@ -20,15 +20,15 @@ public class AprilTagSignalDetectorPipeline extends OpenCvPipeline {
         if (!detections.isEmpty() && tagIds.contains(detections.get(0).id)) {
             caseDetected = tagIds.indexOf(detections.get(0).id) + 1;
             Imgproc.rectangle(input, detections.get(0).corners[0], detections.get(0).corners[2], new Scalar(100, 100, 255), 2);
-            Imgproc.putText(input, "Case: " + caseDetected, new Point(10, 350), 0, 0.5, new Scalar(100, 100, 255), 1);
-            Imgproc.putText(input, "Tag ID: " + detections.get(0).id, new Point(10, 335), 0, 0.5, new Scalar(100, 100, 255), 1);
+            Imgproc.putText(input, "Case: " + caseDetected, new Point(10, 465), 0, 0.7, new Scalar(100, 100, 255), 2);
+            Imgproc.putText(input, "Tag ID: " + detections.get(0).id, new Point(10, 440), 0, 0.7, new Scalar(100, 100, 255), 2);
         } else {
             caseDetected = 0;
-            Imgproc.putText(input, "No Case Detected", new Point(10, 350), 0, 0.5, new Scalar(100, 100, 255), 1);
+            Imgproc.putText(input, "No Signal Detected", new Point(10, 465), 0, 0.7, new Scalar(100, 100, 255), 2);
             if (detections.isEmpty()) {
-                Imgproc.putText(input, "No Tag Detected", new Point(10, 335), 0, 0.5, new Scalar(100, 100, 255), 1);
+                Imgproc.putText(input, "No Tag Detected", new Point(10, 440), 0, 0.7, new Scalar(100, 100, 255), 2);
             } else {
-                Imgproc.putText(input, "Tag ID: " + detections.get(0).id, new Point(10, 335), 0, 0.5, new Scalar(100, 100, 255), 1);
+                Imgproc.putText(input, "Tag ID: " + detections.get(0).id, new Point(10, 440), 0, 0.75, new Scalar(100, 100, 255), 2);
             }
         }
         return input;
