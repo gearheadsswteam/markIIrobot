@@ -11,10 +11,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.classes.ProfileChain;
 import org.firstinspires.ftc.teamcode.classes.Robot;
-import org.firstinspires.ftc.teamcode.classes.TrapezoidalProfile;
 import org.firstinspires.ftc.teamcode.classes.ValueStorage;
-@TeleOp(name = "TeleOpOneDriver")
-public class TeleOpOneDriver extends LinearOpMode {
+@TeleOp(name = "TeleopOneDriver")
+public class TeleopOneDriver extends LinearOpMode {
     Robot robot = new Robot();
     int state = 0;
     int holderDetectionCount = 0;
