@@ -16,10 +16,7 @@ public abstract class AbstractAutonomous extends LinearOpMode {
     double time;
     @Override
     public void runOpMode() {
-        robot.init(hardwareMap, armIn, wristIn);
-        robot.gripper.setPosition(gripperHold);
-        robot.retract.setPosition(odoDown);
-        robot.roller.setPosition(rollerRetract);
+        robot.init(hardwareMap);
         detector = new SignalDetector(hardwareMap);
         detector.init();
         robot.drive.setPoseEstimate(initPose());

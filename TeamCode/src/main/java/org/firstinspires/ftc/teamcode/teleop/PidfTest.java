@@ -1,61 +1,66 @@
 package org.firstinspires.ftc.teamcode.teleop;
-import static java.lang.Math.*;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.classes.PidfController;
-import org.firstinspires.ftc.teamcode.classes.TrapezoidalProfile;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.classes.PidfController;
+import org.firstinspires.ftc.teamcode.classes.Robot;
+import org.firstinspires.ftc.teamcode.classes.TrapezoidalProfile;
 @Config
-@Disabled
-@TeleOp (name = "PidfTest", group = "TeleOp")
+@TeleOp(name = "PidfTest")
 public class PidfTest extends LinearOpMode {
-    public static double KP = liftKp;
-    public static double KI = liftKi;
-    public static double KD = liftKd;
-    public static double A_MAX = liftMaxAccel;
-    public static double V_MAX = liftMaxVel;
-    double kfTest(double input) {
-        return liftKf(input);
-    }
-    DcMotorEx test1;
-    DcMotorEx test2;
-    PidfController lift = new PidfController(KP, KI, KD) {
-        public double kf(double input) {
-            return kfTest (input);
-        }
-    };
-    TrapezoidalProfile currentProfile = new TrapezoidalProfile(V_MAX, A_MAX,0, 0, 0, 0, 0);
-    ElapsedTime clock = new ElapsedTime();
-    Telemetry multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-    double[][] lastPos = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    double pos;
-    double time ;
+    Robot robot = new Robot();
+    double time = 0;
+    double liftSetPoint = 0;
+    double armSetPoint = 0;
+    public static double LIFT_KP = 0.005;
+    public static double LIFT_KI = 0;
+    public static double LIFT_KD = 0;
+    public static double ARM_KP = 0.01;
+    public static double ARM_KI = 0;
+    public static double ARM_KD = 0;
+    public static double LIFT_VM = 4000;
+    public static double LIFT_AM = 7500;
+    public static double ARM_VM = 2500;
+    public static double ARM_AM = 5000;
     boolean aPressed = false;
-    boolean bPressed = false;
     boolean aReleased = true;
+    boolean bPressed = false;
     boolean bReleased = true;
     boolean xPressed = false;
     boolean xReleased = false;
     boolean yPressed = false;
     boolean yReleased = false;
+    boolean lbPressed = false;
+    boolean lbReleased = false;
+    boolean rbPressed = false;
+    boolean rbReleased = false;
+    ElapsedTime clock = new ElapsedTime();
+    PidfController liftPid = new PidfController(LIFT_KP, LIFT_KI, LIFT_KD) {
+        @Override
+        public double kf(double x, double v, double a) {
+            return 0.1 + 0.00005 * x + 0 * v + 0 * a;
+        }
+    };
+    PidfController armPid = new PidfController(ARM_KP, ARM_KI, ARM_KD) {
+        @Override
+        public double kf(double x, double v, double a) {
+            return 0 * x + 0 * v + 0 * a;
+        }
+    };
+    TrapezoidalProfile liftProfile = new TrapezoidalProfile(LIFT_VM, LIFT_AM, 0, liftSetPoint, 0, liftSetPoint, 0);
+    TrapezoidalProfile armProfile = new TrapezoidalProfile(ARM_VM, ARM_AM, 0, armSetPoint, 0, armSetPoint, 0);
     @Override
     public void runOpMode() {
-        test1 = hardwareMap.get(DcMotorEx.class, "liftL");
-        test2 = hardwareMap.get(DcMotorEx.class, "liftR");
-        test2.setDirection(DcMotorSimple.Direction.REVERSE);
-        test1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        test1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        test1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        test1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        robot.init(hardwareMap);
+        robot.liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
             if (gamepad1.a) {
@@ -86,33 +91,50 @@ public class PidfTest extends LinearOpMode {
                 yPressed = false;
                 yReleased = true;
             }
+            if (gamepad1.left_bumper) {
+                lbPressed = lbReleased;
+                lbReleased = false;
+            } else {
+                lbPressed = false;
+                lbReleased = true;
+            }
+            if (gamepad1.right_bumper) {
+                rbPressed = rbReleased;
+                rbReleased = false;
+            } else {
+                rbPressed = false;
+                rbReleased = true;
+            }
             time = clock.seconds();
-            pos = test1.getCurrentPosition();
-            if (aPressed) {
-                currentProfile = currentProfile.extendTrapezoidal(V_MAX, A_MAX, time, min(1100, currentProfile.getX(time) + 500), 0);
-            } else if (yPressed) {
-                currentProfile = currentProfile.extendTrapezoidal(V_MAX, A_MAX, time, min(1100, currentProfile.getX(time) + 100), 0);
-            } else if (bPressed) {
-                currentProfile = currentProfile.extendTrapezoidal(V_MAX, A_MAX, time, max(0, currentProfile.getX(time) - 500), 0);
-            } else if (xPressed) {
-                currentProfile = currentProfile.extendTrapezoidal(V_MAX, A_MAX, time, max(0, currentProfile.getX(time) - 100), 0);
+            /*
+            if (aPressed && time > liftProfile.getTf()) {
+                liftSetPoint = 2000;
+                liftProfile = liftProfile.extendTrapezoidal(LIFT_VM, LIFT_AM, time, liftSetPoint, 0);
+            } else if (bPressed && time > liftProfile.getTf()) {
+                liftSetPoint = 0;
+                liftProfile = liftProfile.extendTrapezoidal(LIFT_VM, LIFT_AM, time, liftSetPoint, 0);
             }
-            multipleTelemetry.addData("Position", pos);
-            multipleTelemetry.addData("Velocity", (pos - lastPos[8][0]) / (time - lastPos[8][1]));
-            multipleTelemetry.addData("Set Point", currentProfile.getX(time));
-            multipleTelemetry.addData("Set Velocity", currentProfile.getV(time));
-            multipleTelemetry.addData("Power", lift.get());
-            multipleTelemetry.update();
-            lift.update(pos);
-            lift.set(currentProfile.getX(time));
-            lift.setConstants(KP, KI, KD);
-            test1.setPower(lift.get());
-            test2.setPower(lift.get());
-            for (int i = lastPos.length - 2; i >= 0; i--) {
-                lastPos[i + 1][0] = lastPos[i][0];
-                lastPos[i + 1][1] = lastPos[i][1];
+             */
+            if (aPressed && time > armProfile.getTf()) {
+                armSetPoint = 650;
+                armProfile = armProfile.extendTrapezoidal(ARM_VM, ARM_AM, time, armSetPoint, 0);
+            } else if (bPressed && time > liftProfile.getTf()) {
+                armSetPoint = 0;
+                armProfile = armProfile.extendTrapezoidal(ARM_VM, ARM_AM, time, armSetPoint, 0);
             }
-            lastPos[0] = new double[] {pos, time};
+            liftPid.setConstants(LIFT_KP, LIFT_KI, LIFT_KD);
+            armPid.setConstants(ARM_KP, ARM_KI, ARM_KD);
+            liftPid.set(liftProfile.getX(time));
+            liftPid.update(time, robot.liftL.getCurrentPosition() + robot.liftR.getCurrentPosition(), liftProfile.getV(time), liftProfile.getA(time));
+            armPid.set(armProfile.getX(time));
+            armPid.update(time, robot.liftL.getCurrentPosition() - robot.liftR.getCurrentPosition(), armProfile.getV(time), armProfile.getA(time));
+            robot.liftL.setPower(liftPid.get() + armPid.get());
+            robot.liftR.setPower(liftPid.get() - armPid.get());
+            telemetry.addData("Left Power", liftPid.get() + armPid.get());
+            telemetry.addData("Right Power", liftPid.get() - armPid.get());
+            telemetry.addData("Arm Set Point", armProfile.getX(time));
+            telemetry.addData("Arm Position", robot.liftL.getCurrentPosition() - robot.liftR.getCurrentPosition());
+            telemetry.update();
         }
     }
 }
