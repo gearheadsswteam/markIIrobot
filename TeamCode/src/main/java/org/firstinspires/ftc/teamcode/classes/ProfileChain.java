@@ -1,15 +1,16 @@
 package org.firstinspires.ftc.teamcode.classes;
 import java.util.ArrayList;
+
 public class ProfileChain extends MotionProfile {
     ArrayList<MotionProfile> profiles = new ArrayList<>();
     public ProfileChain(ArrayList<MotionProfile> profiles) {
         for (int i = 0; i < profiles.size(); i++) {
             if (i < profiles.size() - 1 && profiles.get(i).getX(profiles.get(i + 1).getTi()) != profiles.get(i + 1).xi) {
-                throw new java.lang.RuntimeException("PositionContinuityError");
+                throw new RuntimeException("PositionContinuityError");
             } else if (i < profiles.size() - 1 && profiles.get(i).getV(profiles.get(i + 1).getTi()) != profiles.get(i + 1).vi) {
-                throw new java.lang.RuntimeException("VelocityContinuityError");
+                throw new RuntimeException("VelocityContinuityError");
             }  else if (i < profiles.size() - 1 && profiles.get(i).getTf() > profiles.get(i + 1).getTi()) {
-                throw new java.lang.RuntimeException("ProfileInterferenceError");
+                throw new RuntimeException("ProfileInterferenceError");
             }
             if (profiles.get(i) instanceof ProfileChain) {
                 this.profiles.addAll(((ProfileChain) profiles.get(i)).getProfiles());
@@ -69,7 +70,7 @@ public class ProfileChain extends MotionProfile {
     }
     public ProfileChain addExtendTrapezoidal(double vm, double am, double t, double xf, double vf) {
         if (t < tf) {
-            throw new java.lang.RuntimeException("ProfileInterferenceError");
+            throw new RuntimeException("ProfileInterferenceError");
         }
         return add(extendTrapezoidal(vm, am, t, xf, vf));
     }
@@ -78,7 +79,7 @@ public class ProfileChain extends MotionProfile {
     }
     public ProfileChain addExtendDelay(double t, double deltaT) {
         if (t < tf) {
-            throw new java.lang.RuntimeException("ProfileInterferenceError");
+            throw new RuntimeException("ProfileInterferenceError");
         }
         return add(extendDelay(t, deltaT));
     }

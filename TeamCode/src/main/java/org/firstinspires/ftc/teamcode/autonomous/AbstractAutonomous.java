@@ -1,11 +1,19 @@
 package org.firstinspires.ftc.teamcode.autonomous;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
+
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armDownFront;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.lastPose;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.side;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.signalMinCount;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristNeutral;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.classes.Robot;
 import org.firstinspires.ftc.teamcode.classes.SignalDetector;
+
 public abstract class AbstractAutonomous extends LinearOpMode {
     public Robot robot = new Robot();
     SignalDetector detector;
@@ -16,7 +24,7 @@ public abstract class AbstractAutonomous extends LinearOpMode {
     double time;
     @Override
     public void runOpMode() {
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, 0, armDownFront, wristNeutral);
         detector = new SignalDetector(hardwareMap);
         detector.init();
         robot.drive.setPoseEstimate(initPose());

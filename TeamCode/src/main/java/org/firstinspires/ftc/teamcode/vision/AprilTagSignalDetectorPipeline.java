@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.vision;
-import static org.firstinspires.ftc.teamcode.vision.VisionValueStorage.*;
+
+import static org.firstinspires.ftc.teamcode.vision.VisionValueStorage.tagIds;
+import static org.firstinspires.ftc.teamcode.vision.VisionValueStorage.tagSize;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -7,7 +10,9 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvPipeline;
+
 import java.util.ArrayList;
+
 public class AprilTagSignalDetectorPipeline extends OpenCvPipeline {
     int caseDetected = 0;
     long tagDetectorPointer = AprilTagDetectorJNI.createApriltagDetector("tag36h11", 3, 1);

@@ -1,16 +1,22 @@
 package org.firstinspires.ftc.teamcode.vision;
-import static org.firstinspires.ftc.teamcode.vision.VisionValueStorage.*;
+
+import static org.firstinspires.ftc.teamcode.vision.VisionValueStorage.signalLower;
+import static org.firstinspires.ftc.teamcode.vision.VisionValueStorage.signalMinArea;
+import static org.firstinspires.ftc.teamcode.vision.VisionValueStorage.signalUpper;
+
 import org.opencv.core.Core;
+import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-import org.opencv.core.Scalar;
-import org.opencv.core.Mat;
+
 import java.util.ArrayList;
+
 public class ColorSignalDetectorPipeline extends OpenCvPipeline {
     int caseDetected = 0;
     Mat process = new Mat();

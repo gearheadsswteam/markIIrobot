@@ -1,8 +1,24 @@
 package org.firstinspires.ftc.teamcode.classes;
-import static java.lang.Math.*;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
+
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armAm;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armKd;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armKf;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armKi;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armKp;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armMaxPower;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armVm;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftAm;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftKd;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftKf;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftKi;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftKp;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftMaxPower;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftVm;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristAm;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristVm;
+import static java.lang.Math.max;
+
 import com.outoftheboxrobotics.photoncore.PhotonCore;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -10,10 +26,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+
 public class Robot {
     public SampleMecanumDrive drive;
     public DcMotorEx fl;
@@ -37,10 +55,10 @@ public class Robot {
             return armKf(x, v, a);
         }
     };
-    public TrapezoidalProfile liftProfile;
+    public MotionProfile liftProfile;
     public MotionProfile armProfile;
     public MotionProfile wristProfile;
-    public void init(HardwareMap hwMap) {
+    public void init(HardwareMap hwMap, double liftX, double armX, double wristX) {
         drive = new SampleMecanumDrive(hwMap);
         fl = hwMap.get(DcMotorEx.class, "fl");
         fr = hwMap.get(DcMotorEx.class, "fr");
@@ -58,14 +76,39 @@ public class Robot {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftProfile = new DelayProfile(0, liftX, 0,0);
+        armProfile = new DelayProfile(0, armX, 0, 0);
+        wristProfile = new DelayProfile(0, wristX, 0, 0);
         PhotonCore.enable();
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+                RevHubOrientationOnRobot.UsbFacingDirection.UP));
         gyro.initialize(parameters);
     }
     public double heading() {
         return gyro.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+    }
+    public double restTime() {
+        return max(max(liftProfile.getTf(), armProfile.getTf()), wristProfile.getTf());
+    }
+    public void setLiftPos(double time, double liftX, double armX, double wristPos) {
+        double t1 = liftProfile.extendTrapezoidal(liftAm, liftVm, time, liftX, 0).getTf() - time;
+        double t2 = armProfile.extendTrapezoidal(armAm, armVm, time, armX, 0).getTf() - time;
+        double f1;
+        double f2;
+        if (t1 == 0) {
+            f1 = 0;
+            f2 = 1;
+        } else if (t2 == 0) {
+            f1 = 1;
+            f2 = 0;
+        } else {
+            f1 = 1 / (t1 * armMaxPower / t2 + liftMaxPower);
+            f2 = 1 / (t2 * liftMaxPower / t1 + armMaxPower);
+        }
+        liftProfile = liftProfile.extendTrapezoidal(liftAm * f1, liftVm * f1, time, liftX, 0);
+        armProfile = armProfile.extendTrapezoidal(armAm * f2, armVm * f2, time, armX, 0);
+        wristProfile = wristProfile.extendTrapezoidal(wristAm, wristVm, time, wristPos, 0);
     }
     public void update(double time) {
         liftPidf.set(liftProfile.getX(time));
@@ -74,6 +117,7 @@ public class Robot {
         armPidf.update(time,liftL.getCurrentPosition() - liftR.getCurrentPosition(), armProfile.getV(time), armProfile.getA(time));
         liftL.setPower(liftPidf.get() + armPidf.get());
         liftR.setPower(liftPidf.get() - armPidf.get());
+        wrist.setPosition(wristProfile.getX(time));
     }
     public void setDrivePowers(double flPower, double frPower, double blPower, double brPower) {
         fl.setPower(flPower);

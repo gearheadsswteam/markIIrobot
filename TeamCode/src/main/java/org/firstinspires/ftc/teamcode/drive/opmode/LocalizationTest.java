@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
-import static java.lang.Math.*;
+
+import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;

@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.classes;
-import static java.lang.Math.*;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
+
 public class TrapezoidalProfile extends MotionProfile {
     double am;
     double vm;
@@ -17,14 +21,18 @@ public class TrapezoidalProfile extends MotionProfile {
         } else {
             this.am = am;
         }
-        if (xf > xi && flat) {
-            this.tf = ti + (xf - xi) / vm + (pow(vm - vi, 2) + pow(vm - vf, 2)) / (2 * this.am * vm);
-        } else if (xf > xi) {
-            this.tf = ti + (2 * sqrt(am * (xf - xi) + (pow(vi, 2) + pow(vf, 2))/ 2) - vi - vf) / this.am;
-        } else if (flat) {
-            this.tf = ti + (xi - xf) / vm + (pow(vm + vi, 2) + pow(vm + vf, 2)) / (2 * this.am * vm);
+        if (am != 0 && vm != 0) {
+            if (xf > xi && flat) {
+                this.tf = ti + (xf - xi) / vm + (pow(vm - vi, 2) + pow(vm - vf, 2)) / (2 * this.am * vm);
+            } else if (xf > xi) {
+                this.tf = ti + (2 * sqrt(am * (xf - xi) + (pow(vi, 2) + pow(vf, 2)) / 2) - vi - vf) / this.am;
+            } else if (flat) {
+                this.tf = ti + (xi - xf) / vm + (pow(vm + vi, 2) + pow(vm + vf, 2)) / (2 * this.am * vm);
+            } else {
+                this.tf = ti + (2 * sqrt(am * (xi - xf) + (pow(vi, 2) + pow(vf, 2)) / 2) + vi + vf) / this.am;
+            }
         } else {
-            this.tf = ti + (2 * sqrt(am * (xi - xf) + (pow(vi, 2) + pow(vf, 2)) / 2) + vi + vf) / this.am;
+            this.tf = 0;
         }
     }
     @Override
