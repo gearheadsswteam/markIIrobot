@@ -4,7 +4,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-
 public class ColorThresholdTuner extends OpenCvPipeline {
     public Scalar lower = new Scalar(0, 0, 0);
     public Scalar upper = new Scalar(255, 255, 255);

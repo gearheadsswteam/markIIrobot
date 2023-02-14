@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.classes;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-
 public class ValueStorage {
     public static double liftVm = 4000;
     public static double liftAm = 7500;
@@ -8,10 +7,10 @@ public class ValueStorage {
     public static double armAm = 5000;
     public static double wristVm = 0.01;
     public static double wristAm = 0.01;
-    public static double liftKp = 0.005;
+    public static double liftKp = 0.01;
     public static double liftKi = 0;
     public static double liftKd = 0;
-    public static double armKp = 0.01;
+    public static double armKp = 0.02;
     public static double armKi = 0;
     public static double armKd = 0;
     public static double liftMaxPower = 1;
@@ -25,9 +24,9 @@ public class ValueStorage {
     public static double clawClosed = 0.50;
     public static double clawOpen = 0.16;
     public static double liftGrab = 150;
-    public static double liftLow = 700;
-    public static double liftMed = 1250;
-    public static double liftHigh = 1900;
+    public static double liftLow = 600;
+    public static double liftMed = 1200;
+    public static double liftHigh = 1800;
     public static double liftGround = 150;
     public static double armDownBack = -650;
     public static double armDownFront = 0;
@@ -38,10 +37,5 @@ public class ValueStorage {
     public static double wristDropBack = 0;
     public static double wristDropFront = 0;
     public static int signalMinCount = 10;
-    public static int side = sides.RED;
-    public static class sides {
-        public static final int RED = 1;
-        public static final int BLUE = -1;
-    }
     public static Pose2d lastPose = new Pose2d(0, 0, 0);
 }

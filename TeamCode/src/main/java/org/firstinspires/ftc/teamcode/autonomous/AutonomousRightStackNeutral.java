@@ -1,25 +1,12 @@
-package teamcode.autonomous;
-
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armDownBack;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armDropFront;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armWait;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.clawClosed;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.clawOpen;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftGrab;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftHigh;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristDropFront;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristNeutral;
-import static java.lang.Math.PI;
-
+package org.firstinspires.ftc.teamcode.autonomous;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
+import static java.lang.Math.*;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.firstinspires.ftc.teamcode.autonomous.AbstractAutonomous;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
 @Autonomous(name = "RightStackNeutral")
 public class AutonomousRightStackNeutral extends AbstractAutonomous {
     Pose2d dropPose1 = new Pose2d(-27, 6, -1);

@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleop;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
+import static java.lang.Math.*;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
-
 @TeleOp(name = "ServoTest", group = "TeleOp")
 public class ServoTest extends LinearOpMode {
     Servo test;

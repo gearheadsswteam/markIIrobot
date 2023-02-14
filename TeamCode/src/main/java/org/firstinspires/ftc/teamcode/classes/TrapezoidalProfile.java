@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.classes;
-
-import static java.lang.Math.abs;
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
-
+import static java.lang.Math.*;
 public class TrapezoidalProfile extends MotionProfile {
     double am;
     double vm;

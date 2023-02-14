@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
-
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armDownBack;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristNeutral;
-
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -10,11 +7,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.classes.PidfController;
 import org.firstinspires.ftc.teamcode.classes.Robot;
 import org.firstinspires.ftc.teamcode.classes.TrapezoidalProfile;
-
 @Config
 @TeleOp(name = "PidfTest")
 public class PidfTest extends LinearOpMode {

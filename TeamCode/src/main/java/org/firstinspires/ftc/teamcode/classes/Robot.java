@@ -1,24 +1,8 @@
 package org.firstinspires.ftc.teamcode.classes;
-
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armAm;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armKd;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armKf;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armKi;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armKp;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armMaxPower;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armVm;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftAm;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftKd;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftKf;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftKi;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftKp;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftMaxPower;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftVm;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristAm;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristVm;
-import static java.lang.Math.max;
-
+import static java.lang.Math.*;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -26,12 +10,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-
 public class Robot {
     public SampleMecanumDrive drive;
     public DcMotorEx fl;
@@ -84,6 +66,7 @@ public class Robot {
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
         gyro.initialize(parameters);
+        claw.setPosition(clawOpen);
     }
     public double heading() {
         return gyro.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;

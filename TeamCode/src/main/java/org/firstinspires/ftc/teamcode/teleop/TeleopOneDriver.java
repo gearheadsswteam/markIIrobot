@@ -1,28 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
-
-import static com.qualcomm.robotcore.util.Range.clip;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armDownBack;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armDownFront;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armDropBack;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armDropFront;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.armWait;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.clawClosed;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.clawOpen;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftGrab;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftGround;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftHigh;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftLow;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.liftMed;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.side;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristDropBack;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristDropFront;
-import static org.firstinspires.ftc.teamcode.classes.ValueStorage.wristNeutral;
-import static java.lang.Math.PI;
-import static java.lang.Math.abs;
-import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
-import static java.lang.Math.pow;
-import static java.lang.Math.sin;
+import static java.lang.Math.*;
+import static com.qualcomm.robotcore.util.Range.*;
+import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -32,12 +11,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.classes.Robot;
 import org.firstinspires.ftc.teamcode.classes.ValueStorage;
-
 @TeleOp(name = "TeleopOneDriver")
 public class TeleopOneDriver extends LinearOpMode {
     Robot robot = new Robot();
     int state = 0;
-    double initialHeading = ValueStorage.lastPose.getHeading() - side * PI / 2;
+    double initialHeading = ValueStorage.lastPose.getHeading() + PI / 2;
     double robotHeading;
     double moveAngle;
     double moveMagnitude;
@@ -62,8 +40,7 @@ public class TeleopOneDriver extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        //robot.init(hardwareMap, 0, armGrabBack, wristGrabBack);
-        robot.init(hardwareMap, 0, armDownFront, wristNeutral);
+        robot.init(hardwareMap, 0, armWait, wristNeutral);
         robot.setLiftPos(clock.seconds(), liftGrab, armDownBack, wristNeutral);
         robot.claw.setPosition(clawOpen);
         while (!isStarted() && !isStopRequested()) {
