@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.classes;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 public class ValueStorage {
     public static double liftVm = 4000;
-    public static double liftAm = 7500;
+    public static double liftAm = 10000;
     public static double armVm = 2500;
     public static double armAm = 5000;
     public static double wristVm = 0.01;
@@ -36,6 +36,8 @@ public class ValueStorage {
     public static double wristNeutral = 0;
     public static double wristDropBack = 0;
     public static double wristDropFront = 0;
+    public static double grabAdjustIncrement = 90;
+    public static double grabAdjustMax = 630;
     public static int signalMinCount = 10;
     public static Pose2d lastPose = new Pose2d(0, 0, 0);
 }

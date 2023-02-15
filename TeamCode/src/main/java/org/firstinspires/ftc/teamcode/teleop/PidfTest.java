@@ -61,7 +61,7 @@ public class PidfTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        robot.init(hardwareMap, 0, armDownBack, wristNeutral);
+        robot.init(hardwareMap, 0, armDownFront, wristNeutral);
         robot.liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
