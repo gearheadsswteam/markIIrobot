@@ -36,6 +36,9 @@ public abstract class PidfController {
         i += (e + lastE) * dt / 2;
         d = (e - lastE) / dt;
         f = kf(x, v, a);
+        if (lastE > 0 && e < 0 || lastE < 0 && e > 0) {
+            reset();
+        }
         lastTime = time;
         lastE = e;
     }

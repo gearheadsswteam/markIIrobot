@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.classes.Robot;
 import org.firstinspires.ftc.teamcode.classes.ValueStorage;
-@TeleOp(name = "OneDriver")
-public class TeleopOneDriver extends LinearOpMode {
+@TeleOp(name = "TwoDriver")
+public class TeleopTwoDriver extends LinearOpMode {
     Robot robot = new Robot();
     int state = 0;
     double initialHeading = ValueStorage.lastPose.getHeading() + PI / 2;
@@ -48,42 +48,42 @@ public class TeleopOneDriver extends LinearOpMode {
             robot.update(clock.seconds());
         }
         while (opModeIsActive() && !isStopRequested()) {
-            if (gamepad1.a) {
+            if (gamepad2.a) {
                 aPressed = aReleased;
                 aReleased = false;
             } else {
                 aPressed = false;
                 aReleased = true;
             }
-            if (gamepad1.b) {
+            if (gamepad2.b) {
                 bPressed = bReleased;
                 bReleased = false;
             } else {
                 bPressed = false;
                 bReleased = true;
             }
-            if (gamepad1.x) {
+            if (gamepad2.x) {
                 xPressed = xReleased;
                 xReleased = false;
             } else {
                 xPressed = false;
                 xReleased = true;
             }
-            if (gamepad1.y) {
+            if (gamepad2.y) {
                 yPressed = yReleased;
                 yReleased = false;
             } else {
                 yPressed = false;
                 yReleased = true;
             }
-            if (gamepad1.left_bumper) {
+            if (gamepad2.left_bumper) {
                 lbPressed = lbReleased;
                 lbReleased = false;
             } else {
                 lbPressed = false;
                 lbReleased = true;
             }
-            if (gamepad1.right_bumper) {
+            if (gamepad2.right_bumper) {
                 rbPressed = rbReleased;
                 rbReleased = false;
             } else {
@@ -100,7 +100,7 @@ public class TeleopOneDriver extends LinearOpMode {
                         closeClaw = true;
                         robot.setLiftPos(time, grabAdjust, armDownBack, wristNeutral);
                         state = 1;
-                    } else if (gamepad1.right_trigger > 0.2) {
+                    } else if (gamepad2.right_trigger > 0.2) {
                         robot.setLiftPos(time, liftGrab, armDownFront, wristNeutral);
                         grabAdjust = 0;
                         grabbingBack = false;
@@ -110,7 +110,7 @@ public class TeleopOneDriver extends LinearOpMode {
                         closeClaw = true;
                         robot.setLiftPos(time, grabAdjust, armDownFront, wristNeutral);
                         state = 1;
-                    } else if (gamepad1.right_trigger > 0.2) {
+                    } else if (gamepad2.right_trigger > 0.2) {
                         robot.setLiftPos(time, liftGrab, armDownBack, wristNeutral);
                         grabAdjust = 0;
                         grabbingBack = true;
@@ -139,11 +139,11 @@ public class TeleopOneDriver extends LinearOpMode {
                             robot.setLiftPos(max(robot.restTime(), time), liftGrab + grabAdjust, armDownFront, wristNeutral);
                         }
                         state = 0;
-                    } else if (gamepad1.left_trigger > 0.2) {
+                    } else if (gamepad2.left_trigger > 0.2) {
                         robot.setLiftPos(max(robot.restTime(), time), 0, armWait, wristNeutral);
                         waiting = true;
                         state = 2;
-                    } else if (gamepad1.right_trigger > 0.2) {
+                    } else if (gamepad2.right_trigger > 0.2) {
                         if (aPressed) {
                             robot.setLiftPos(max(robot.restTime(), time), liftLow, armDropBack, wristDropBack);
                             state = 2;
@@ -180,10 +180,10 @@ public class TeleopOneDriver extends LinearOpMode {
                     lastWristX = robot.wristProfile.getX(time);
                     robot.claw.setPosition(clawOpen);
                     state = 3;
-                } else if (gamepad1.left_trigger > 0.2) {
+                } else if (gamepad2.left_trigger > 0.2) {
                     robot.setLiftPos(time, 0, armWait, wristNeutral);
                     waiting = true;
-                } else if (gamepad1.right_trigger > 0.2) {
+                } else if (gamepad2.right_trigger > 0.2) {
                     if (aPressed) {
                         robot.setLiftPos(time, liftLow, armDropBack, wristDropBack);
                         waiting = false;
@@ -213,7 +213,7 @@ public class TeleopOneDriver extends LinearOpMode {
                     }
                 }
             } else if (state == 3) {
-                if (gamepad1.right_trigger > 0.2 && rbPressed) {
+                if (gamepad2.right_trigger > 0.2 && rbPressed) {
                     robot.setLiftPos(time, liftGrab, armDownFront, wristNeutral);
                     grabbingBack = false;
                     grabAdjust = 0;
@@ -225,14 +225,14 @@ public class TeleopOneDriver extends LinearOpMode {
                     state = 0;
                 }
             }
-            if (gamepad1.dpad_up && time > robot.restTime() && !closeClaw) {
+            if (gamepad2.dpad_up && time > robot.restTime()) {
                 grabAdjust = min(grabAdjust + grabAdjustIncrement, grabAdjustMax);
                 if (state == 0) {
                     robot.setLiftPos(time, liftGrab + grabAdjust, robot.armProfile.getX(time), wristNeutral);
                 } else if (state == 1) {
                     robot.setLiftPos(time, grabHeight + grabAdjust, robot.armProfile.getX(time), wristNeutral);
                 }
-            } else if (gamepad1.dpad_down && time > robot.restTime() && !closeClaw) {
+            } else if (gamepad2.dpad_down && time > robot.restTime()) {
                 grabAdjust = max(grabAdjust - grabAdjustIncrement, 0);
                 if (state == 0) {
                     robot.setLiftPos(time, liftGrab + grabAdjust, robot.armProfile.getX(time), wristNeutral);
@@ -250,10 +250,17 @@ public class TeleopOneDriver extends LinearOpMode {
             if (abs(turn) < 0.02) {
                 turn = 0;
             }
-            robot.setDrivePowers(moveMagnitude * clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) + turn,
-                    moveMagnitude * clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)), -1, 1) - turn,
-                    moveMagnitude * clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)),     -1, 1) + turn,
-                    moveMagnitude * clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) - turn);
+            if (gamepad1.right_trigger > 0.2) {
+                robot.setDrivePowers(0.3 * (moveMagnitude * clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) + turn),
+                        0.3 * (moveMagnitude * clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)), -1, 1) - turn),
+                        0.3 * (moveMagnitude * clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)),     -1, 1) + turn),
+                        0.3 * (moveMagnitude * clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) - turn));
+            } else {
+                robot.setDrivePowers(moveMagnitude * clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) + turn,
+                        moveMagnitude * clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)), -1, 1) - turn,
+                        moveMagnitude * clip(sin(PI / 4 + moveAngle) / abs(cos(PI / 4 + moveAngle)), -1, 1) + turn,
+                        moveMagnitude * clip(sin(PI / 4 - moveAngle) / abs(cos(PI / 4 - moveAngle)), -1, 1) - turn);
+            }
         }
     }
 }

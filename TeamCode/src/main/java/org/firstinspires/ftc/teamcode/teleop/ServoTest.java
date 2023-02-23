@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Math.*;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -17,6 +19,7 @@ public class ServoTest extends LinearOpMode {
     boolean yReleased = false;
     @Override
     public void runOpMode() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         test = hardwareMap.get(Servo.class, "claw");
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
