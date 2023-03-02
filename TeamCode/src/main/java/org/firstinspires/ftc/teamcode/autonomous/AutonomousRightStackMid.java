@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Autonomous(name = "RightStackMid")
 public class AutonomousRightStackMid extends AbstractAutonomous {
     Pose2d dropPose = new Pose2d(-29, 22, 0.6);
-    Pose2d stackPose = new Pose2d(-67, 13, 0);
-    Pose2d[] parkPose = new Pose2d[] {new Pose2d(-11, 13, 0), new Pose2d(-35, 13, 0), new Pose2d(-59, 13, 0)};
+    Pose2d stackPose = new Pose2d(-66, 13, 0);
+    Pose2d[] parkPose = new Pose2d[] {new Pose2d(-12, 13, 0), new Pose2d(-36, 13, 0), new Pose2d(-60, 13, 0)};
     TrajectorySequence traj1;
     TrajectorySequence traj2;
     TrajectorySequence[] traj3;
@@ -49,7 +49,7 @@ public class AutonomousRightStackMid extends AbstractAutonomous {
                     robot.claw.setPosition(clawClosed);
                     robot.setLiftPos(time + 0.25, stackOffsets[0] + 300, armDownBack, wristNeutral);
                 })
-                .waitSeconds(0.75)
+                .waitSeconds(0.6)
                 .setReversed(false)
                 .lineTo(new Vector2d(-55, 13))
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(50))
@@ -72,11 +72,8 @@ public class AutonomousRightStackMid extends AbstractAutonomous {
                 .build();
         traj3 = new TrajectorySequence[] {
                 robot.drive.trajectorySequenceBuilder(dropPose)
-                        .setReversed(true)
-                        .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
-                        .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
-                        .lineTo(new Vector2d(-35, 18))
-                        .splineToSplineHeading(parkPose[0], 0)
+                        .lineToLinearHeading(parkPose[1])
+                        .lineTo(parkPose[0].vec())
                         .addTemporalMarker(0, 0, () -> {
                             robot.setLiftPos(time, 0, armWait, wristNeutral);
                             readyToEnd = true;
@@ -99,8 +96,6 @@ public class AutonomousRightStackMid extends AbstractAutonomous {
                         .build(),
                 robot.drive.trajectorySequenceBuilder(dropPose)
                         .setReversed(true)
-                        .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
-                        .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
                         .splineTo(parkPose[2].vec(), PI)
                         .addTemporalMarker(0, 0, () -> {
                             robot.setLiftPos(time, 0, armWait, wristNeutral);
@@ -114,7 +109,7 @@ public class AutonomousRightStackMid extends AbstractAutonomous {
     @Override
     public void run() {
         robot.drive.followTrajectorySequenceAsync(traj1);
-        while(opModeIsActive() && !isStopRequested() && (!parkDone || (readyToEnd && time < robot.restTime()))) {
+        while(opModeIsActive() && !isStopRequested() && (!parkDone || (!readyToEnd && time < robot.restTime()))) {
             time = clock.seconds();
             robot.drive.update();
             robot.update(time);

@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Autonomous(name = "RightParkHigh")
 public class AutonomousRightParkHigh extends AbstractAutonomous {
-    Pose2d dropPose = new Pose2d(-27, 5, -1);
-    Pose2d[] parkPose = new Pose2d[] {new Pose2d(-11, 34, -PI / 2), new Pose2d(-35, 34, -PI / 2), new Pose2d(-59, 34, -PI / 2)};
+    Pose2d dropPose = new Pose2d(-25, 5, -1);
+    Pose2d[] parkPose = new Pose2d[] {new Pose2d(-12, 36, -PI / 2), new Pose2d(-36, 36, -PI / 2), new Pose2d(-60, 36, -PI / 2)};
     TrajectorySequence traj1;
     TrajectorySequence[] traj2;
     boolean readyToEnd = false;
@@ -76,7 +76,7 @@ public class AutonomousRightParkHigh extends AbstractAutonomous {
     @Override
     public void run() {
         robot.drive.followTrajectorySequenceAsync(traj1);
-        while(opModeIsActive() && !isStopRequested() && (!parkDone || (readyToEnd && time < robot.restTime()))) {
+        while(opModeIsActive() && !isStopRequested() && (!parkDone || (!readyToEnd && time < robot.restTime()))) {
             time = clock.seconds();
             robot.drive.update();
             robot.update(time);

@@ -65,6 +65,7 @@ public class Robot {
         liftProfile = new DelayProfile(0, liftX, 0,0);
         armProfile = new DelayProfile(0, armX, 0, 0);
         wristProfile = new DelayProfile(0, wristX, 0, 0);
+        PhotonCore.experimental.setMaximumParallelCommands(8);
         PhotonCore.enable();
         synchronized (gyroLock) {
             IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(

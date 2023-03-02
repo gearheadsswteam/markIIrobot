@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.classes.SignalDetector;
 public abstract class AbstractAutonomous extends LinearOpMode {
     public Robot robot = new Robot();
     SignalDetector detector;
-    int runCase = 1;
-    int caseDetected = 1;
+    int runCase = 2;
+    int caseDetected = 2;
     int caseDetectionLength = 0;
     ElapsedTime clock = new ElapsedTime();
     double time = 0;
@@ -19,14 +19,13 @@ public abstract class AbstractAutonomous extends LinearOpMode {
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         robot.init(hardwareMap, 0, armDownFront, wristNeutral);
-        //detector = new SignalDetector(hardwareMap);
-        //detector.init();
+        detector = new SignalDetector(hardwareMap);
+        detector.init();
         initialize();
         robot.resetLift();
-        robot.setLiftPos(clock.seconds() + 0.5, 0, armDropFront, wristDropFront);
+        robot.setLiftPos(clock.seconds() + 1, 0, armDropFront, wristDropFront);
         robot.claw.setPosition(clawClosed);
         while (!isStarted() && !isStopRequested()) {
-            /*
             if (detector.getCaseDetected() == caseDetected) {
                 caseDetectionLength++;
             } else if (detector.getCaseDetected() > 0) {
@@ -36,15 +35,15 @@ public abstract class AbstractAutonomous extends LinearOpMode {
             if (caseDetectionLength >= signalMinCount) {
                 runCase = caseDetected;
             }
-            */
             robot.update(clock.seconds());
             telemetry.addData("Case Detected", caseDetected);
             telemetry.addData("Case to Run", runCase);
             telemetry.update();
         }
-        //detector.end();
+        detector.end();
         robot.drive.setPoseEstimate(initPose());
         run();
+        robot.setDrivePowers(0, 0, 0, 0);
         lastPose = robot.drive.getPoseEstimate();
     }
     public abstract void initialize();

@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-@Autonomous(name = "RightParkMid")
-public class AutonomousRightParkMid extends AbstractAutonomous {
-    Pose2d dropPose = new Pose2d(-27, 29, -1);
-    Pose2d[] parkPose = new Pose2d[] {new Pose2d(-12, 36, -PI / 2), new Pose2d(-36, 36, -PI / 2), new Pose2d(-60, 36, -PI / 2)};
+@Autonomous(name = "LeftParkMid")
+public class AutonomousLeftParkMid extends AbstractAutonomous {
+    Pose2d dropPose = new Pose2d(27, 29, PI + 1);
+    Pose2d[] parkPose = new Pose2d[] {new Pose2d(60, 36, -PI / 2), new Pose2d(36, 36, -PI / 2), new Pose2d(12, 36, -PI / 2)};
     TrajectorySequence traj1;
     TrajectorySequence[] traj2;
     boolean readyToEnd = false;
@@ -20,7 +20,7 @@ public class AutonomousRightParkMid extends AbstractAutonomous {
         traj1 = robot.drive.trajectorySequenceBuilder(initPose())
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(30))
-                .splineTo(new Vector2d(-35, 50), -PI / 2)
+                .splineTo(new Vector2d(35, 50), -PI / 2)
                 .splineTo(dropPose.vec(), dropPose.getHeading())
                 .addTemporalMarker(1, -1.5, () -> {
                     robot.setLiftPos(time, liftMid, armDropFront, wristDropFront);
@@ -81,6 +81,6 @@ public class AutonomousRightParkMid extends AbstractAutonomous {
     }
     @Override
     public Pose2d initPose() {
-        return new Pose2d(-32, 64, -PI / 2);
+        return new Pose2d(32, 64, -PI / 2);
     }
 }

@@ -120,7 +120,7 @@ public class PidfTest extends LinearOpMode {
                     f1 = min(1, 1 / (t2 * ARM_MP / t1 + LIFT_MP));
                 }
                 if (t2 != 0) {
-                    f2 = min(1, 1 / (t1 * ARM_MP / t2 + LIFT_MP));
+                    f2 = min(1, 1 / (t1 * LIFT_MP / t2 + ARM_MP));
                 }
                 liftProfile = liftProfile.extendTrapezoidal(LIFT_VM * f1, LIFT_AM * f1 * f1, time, liftSetPoint, 0);
                 armProfile = armProfile.extendTrapezoidal(ARM_VM * f2, ARM_AM * f2 * f2, time, armSetPoint, 0);
