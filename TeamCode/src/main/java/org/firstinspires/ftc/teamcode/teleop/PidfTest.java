@@ -22,23 +22,23 @@ public class PidfTest extends LinearOpMode {
     double f1;
     double f2;
     public static double LIFT_MP = 1;
-    public static double ARM_MP = 0.5;
-    public static double LIFT_KGS = 0.1;
-    public static double LIFT_KGD = 0.00005;
+    public static double ARM_MP = 0.75;
+    public static double LIFT_KGS = 0.06;
+    public static double LIFT_KGD = 0.00004;
     public static double LIFT_KV = 0.0002;
-    public static double LIFT_KA = 0.00001;
+    public static double LIFT_KA = 0.00002;
     public static double ARM_KV = 0.0003;
     public static double ARM_KA = 0;
     public static double LIFT_KP = 0.01;
-    public static double LIFT_KI = 0;
+    public static double LIFT_KI = 0.01;
     public static double LIFT_KD = 0.0002;
     public static double ARM_KP = 0.02;
-    public static double ARM_KI = 0.01;
-    public static double ARM_KD = 0.0003;
+    public static double ARM_KI = 0.02;
+    public static double ARM_KD = 0.0002;
     public static double LIFT_VM = 3000;
-    public static double LIFT_AM = 10000;
-    public static double ARM_VM = 2500;
-    public static double ARM_AM = 5000;
+    public static double LIFT_AM = 20000;
+    public static double ARM_VM = 1500;
+    public static double ARM_AM = 15000;
     boolean aPressed = false;
     boolean aReleased = true;
     boolean bPressed = false;
@@ -65,7 +65,7 @@ public class PidfTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        robot.init(hardwareMap, 0, armDownFront, wristNeutral);
+        robot.init(hardwareMap, 0, armDownFront, false);
         robot.resetLift();
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {

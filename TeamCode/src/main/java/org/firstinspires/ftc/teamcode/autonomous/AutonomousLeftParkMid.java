@@ -4,10 +4,13 @@ import static java.lang.Math.*;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Autonomous(name = "LeftParkMid")
+@Disabled
 public class AutonomousLeftParkMid extends AbstractAutonomous {
     Pose2d dropPose = new Pose2d(27, 29, PI + 1);
     Pose2d[] parkPose = new Pose2d[] {new Pose2d(60, 36, -PI / 2), new Pose2d(36, 36, -PI / 2), new Pose2d(12, 36, -PI / 2)};
@@ -23,7 +26,7 @@ public class AutonomousLeftParkMid extends AbstractAutonomous {
                 .splineTo(new Vector2d(35, 50), -PI / 2)
                 .splineTo(dropPose.vec(), dropPose.getHeading())
                 .addTemporalMarker(1, -1.5, () -> {
-                    robot.setLiftPos(time, liftMid, armDropFront, wristDropFront);
+                    robot.setLiftPos(time, liftMid, armDropFront);
                 })
                 .addTemporalMarker(1, 0, () -> {
                     robot.claw.setPosition(clawOpen);
@@ -37,7 +40,7 @@ public class AutonomousLeftParkMid extends AbstractAutonomous {
                         .lineToLinearHeading(parkPose[1])
                         .lineTo(parkPose[0].vec())
                         .addTemporalMarker(0, 0, () -> {
-                            robot.setLiftPos(time, 0, armWait, wristNeutral);
+                            robot.setLiftPos(time, 0, armWait);
                             readyToEnd = true;
                         })
                         .addTemporalMarker(1, 0, () -> {
@@ -49,7 +52,7 @@ public class AutonomousLeftParkMid extends AbstractAutonomous {
                         .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(30))
                         .lineToLinearHeading(parkPose[1])
                         .addTemporalMarker(0, 0, () -> {
-                            robot.setLiftPos(time, 0, armWait, wristNeutral);
+                            robot.setLiftPos(time, 0, armWait);
                             readyToEnd = true;
                         })
                         .addTemporalMarker(1, 0, () -> {
@@ -62,7 +65,7 @@ public class AutonomousLeftParkMid extends AbstractAutonomous {
                         .lineToSplineHeading(parkPose[1])
                         .lineTo(parkPose[2].vec())
                         .addTemporalMarker(0, 0, () -> {
-                            robot.setLiftPos(time, 0, armWait, wristNeutral);
+                            robot.setLiftPos(time, 0, armWait);
                             readyToEnd = true;
                         })
                         .addTemporalMarker(1, 0, () -> {
@@ -73,7 +76,7 @@ public class AutonomousLeftParkMid extends AbstractAutonomous {
     @Override
     public void run() {
         robot.drive.followTrajectorySequenceAsync(traj1);
-        while(opModeIsActive() && !isStopRequested() && (!parkDone || (!readyToEnd && time < robot.restTime()))) {
+        while(opModeIsActive() && !isStopRequested() && (!parkDone || (!readyToEnd && time < robot.restTime() + 0.25))) {
             time = clock.seconds();
             robot.drive.update();
             robot.update(time);

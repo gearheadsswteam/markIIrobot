@@ -4,10 +4,12 @@ import static java.lang.Math.*;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Autonomous(name = "RightParkHigh")
+@Disabled
 public class AutonomousRightParkHigh extends AbstractAutonomous {
     Pose2d dropPose = new Pose2d(-25, 5, -1);
     Pose2d[] parkPose = new Pose2d[] {new Pose2d(-12, 36, -PI / 2), new Pose2d(-36, 36, -PI / 2), new Pose2d(-60, 36, -PI / 2)};
@@ -23,7 +25,7 @@ public class AutonomousRightParkHigh extends AbstractAutonomous {
                 .splineTo(new Vector2d(-35, 35), -PI / 2)
                 .splineTo(dropPose.vec(), dropPose.getHeading())
                 .addTemporalMarker(1, -1.5, () -> {
-                    robot.setLiftPos(time, liftHigh, armDropFront, wristDropFront);
+                    robot.setLiftPos(time, liftHigh, armDropFront);
                 })
                 .addTemporalMarker(1, 0, () -> {
                     robot.claw.setPosition(clawOpen);
@@ -38,7 +40,7 @@ public class AutonomousRightParkHigh extends AbstractAutonomous {
                         .splineTo(parkPose[1].vec(), parkPose[1].getHeading() + PI)
                         .lineTo(parkPose[0].vec())
                         .addTemporalMarker(0, 0, () -> {
-                            robot.setLiftPos(time, 0, armWait, wristNeutral);
+                            robot.setLiftPos(time, 0, armWait);
                             readyToEnd = true;
                         })
                         .addTemporalMarker(1, 0, () -> {
@@ -51,7 +53,7 @@ public class AutonomousRightParkHigh extends AbstractAutonomous {
                         .setReversed(true)
                         .splineTo(parkPose[1].vec(), parkPose[1].getHeading() + PI)
                         .addTemporalMarker(0, 0, () -> {
-                            robot.setLiftPos(time, 0, armWait, wristNeutral);
+                            robot.setLiftPos(time, 0, armWait);
                             readyToEnd = true;
                         })
                         .addTemporalMarker(1, 0, () -> {
@@ -65,7 +67,7 @@ public class AutonomousRightParkHigh extends AbstractAutonomous {
                         .splineTo(parkPose[1].vec(), parkPose[1].getHeading() + PI)
                         .lineTo(parkPose[2].vec())
                         .addTemporalMarker(0, 0, () -> {
-                            robot.setLiftPos(time, 0, armWait, wristNeutral);
+                            robot.setLiftPos(time, 0, armWait);
                             readyToEnd = true;
                         })
                         .addTemporalMarker(1, 0, () -> {
@@ -76,7 +78,7 @@ public class AutonomousRightParkHigh extends AbstractAutonomous {
     @Override
     public void run() {
         robot.drive.followTrajectorySequenceAsync(traj1);
-        while(opModeIsActive() && !isStopRequested() && (!parkDone || (!readyToEnd && time < robot.restTime()))) {
+        while(opModeIsActive() && !isStopRequested() && (!parkDone || (!readyToEnd && time < robot.restTime() + 0.25))) {
             time = clock.seconds();
             robot.drive.update();
             robot.update(time);

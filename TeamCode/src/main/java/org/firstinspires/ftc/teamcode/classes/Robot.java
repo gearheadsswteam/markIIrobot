@@ -3,6 +3,10 @@ import static java.lang.Math.*;
 import static org.firstinspires.ftc.teamcode.classes.ValueStorage.*;
 import androidx.annotation.GuardedBy;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.lynx.LynxNackException;
+import com.qualcomm.hardware.lynx.commands.core.LynxGetADCCommand;
+import com.qualcomm.hardware.lynx.commands.core.LynxGetADCResponse;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,7 +28,7 @@ public class Robot {
     public DcMotorEx liftL;
     public DcMotorEx liftR;
     public Servo claw;
-    public Servo wrist;
+    public LynxModule chub;
     private double heading = 0;
     private final Object gyroLock = new Object();
     @GuardedBy("gyroLock")
@@ -43,8 +47,7 @@ public class Robot {
     };
     public MotionProfile liftProfile;
     public MotionProfile armProfile;
-    public MotionProfile wristProfile;
-    public void init(HardwareMap hwMap, double liftX, double armX, double wristX) {
+    public void init(HardwareMap hwMap, double liftX, double armX, boolean usingGyro) {
         drive = new SampleMecanumDrive(hwMap);
         fl = hwMap.get(DcMotorEx.class, "fl");
         fr = hwMap.get(DcMotorEx.class, "fr");
@@ -52,9 +55,9 @@ public class Robot {
         br = hwMap.get(DcMotorEx.class, "br");
         liftL = hwMap.get(DcMotorEx.class, "liftL");
         liftR = hwMap.get(DcMotorEx.class, "liftR");
-        wrist = hwMap.get(Servo.class, "wrist");
         claw = hwMap.get(Servo.class, "claw");
         gyro = hwMap.get(IMU.class, "gyro");
+        chub = PhotonCore.CONTROL_HUB;
         fl.setDirection(DcMotorSimple.Direction.REVERSE);
         bl.setDirection(DcMotorSimple.Direction.REVERSE);
         liftL.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -64,25 +67,35 @@ public class Robot {
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftProfile = new DelayProfile(0, liftX, 0,0);
         armProfile = new DelayProfile(0, armX, 0, 0);
-        wristProfile = new DelayProfile(0, wristX, 0, 0);
         PhotonCore.experimental.setMaximumParallelCommands(8);
         PhotonCore.enable();
-        synchronized (gyroLock) {
-            IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                    RevHubOrientationOnRobot.UsbFacingDirection.UP));
-            gyro.initialize(parameters);
+        if (usingGyro) {
+            synchronized (gyroLock) {
+                IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                        RevHubOrientationOnRobot.UsbFacingDirection.UP));
+                gyro.initialize(parameters);
+                gyro.resetYaw();
+            }
         }
         claw.setPosition(clawOpen);
     }
     public double restTime() {
-        //return max(max(liftProfile.getTf(), armProfile.getTf()), wristProfile.getTf());
         return max(liftProfile.getTf(), armProfile.getTf());
+    }
+    public double servoCurrent() {
+        LynxGetADCCommand command = new LynxGetADCCommand(chub, LynxGetADCCommand.Channel.SERVO_CURRENT, LynxGetADCCommand.Mode.ENGINEERING);
+        try {
+            LynxGetADCResponse response = command.sendReceive();
+            return response.getValue();
+        } catch (InterruptedException|RuntimeException|LynxNackException e) {
+            return 0;
+        }
     }
     public double getHeading() {
         return heading;
     }
-    public void setLiftPos(double time, double liftX, double armX, double wristPos) {
+    public void setLiftPos(double time, double liftX, double armX) {
         double t1 = liftProfile.extendTrapezoidal(liftVm, liftAm, time, liftX, 0).getTf() - time;
         double t2 = armProfile.extendTrapezoidal(armVm, armAm, time, armX, 0).getTf() - time;
         double f1 = 0;
@@ -95,7 +108,6 @@ public class Robot {
         }
         liftProfile = liftProfile.extendTrapezoidal(liftVm * f1, liftAm * f1 * f1, time, liftX, 0);
         armProfile = armProfile.extendTrapezoidal(armVm * f2, armAm * f2 * f2, time, armX, 0);
-        wristProfile = wristProfile.extendTrapezoidal(wristVm, wristAm, time, wristPos, 0);
     }
     public void update(double time) {
         liftPidf.set(liftProfile.getX(time));
@@ -106,7 +118,6 @@ public class Robot {
         armPidf.update(time,leftX - rightX, armProfile.getV(time), armProfile.getA(time));
         liftL.setPower(liftPidf.get() + armPidf.get());
         liftR.setPower(liftPidf.get() - armPidf.get());
-        //wrist.setPosition(wristProfile.getX(time));
     }
     public void setDrivePowers(double flPower, double frPower, double blPower, double brPower) {
         fl.setPower(flPower);

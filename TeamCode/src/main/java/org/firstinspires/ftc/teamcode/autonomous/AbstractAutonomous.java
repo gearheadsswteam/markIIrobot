@@ -18,12 +18,12 @@ public abstract class AbstractAutonomous extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        robot.init(hardwareMap, 0, armDownFront, wristNeutral);
+        robot.init(hardwareMap, 0, armDownFront, false);
         detector = new SignalDetector(hardwareMap);
         detector.init();
         initialize();
         robot.resetLift();
-        robot.setLiftPos(clock.seconds() + 1, 0, armDropFront, wristDropFront);
+        robot.setLiftPos(clock.seconds() + 1, 0, armDropFront);
         robot.claw.setPosition(clawClosed);
         while (!isStarted() && !isStopRequested()) {
             if (detector.getCaseDetected() == caseDetected) {

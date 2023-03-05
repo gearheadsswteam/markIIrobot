@@ -18,9 +18,9 @@ public class TeleopOneDriver extends LinearOpMode {
     double moveMagnitude;
     double turn;
     double time;
+    double restTime;
     double lastLiftX = liftHigh;
     double lastArmX = armDropFront;
-    double lastWristX = wristNeutral;
     double grabAdjust = 0;
     boolean closeClaw = false;
     boolean grabbingBack = true;
@@ -41,9 +41,9 @@ public class TeleopOneDriver extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        robot.init(hardwareMap, 0, armWait, wristNeutral);
+        robot.init(hardwareMap, 0, armWait, true);
         robot.startGyro(this);
-        robot.setLiftPos(clock.seconds(), liftGrab, armDownBack, wristNeutral);
+        robot.setLiftPos(clock.seconds(), liftGrab, armDownBack);
         while (!isStarted() && !isStopRequested()) {
             robot.update(clock.seconds());
         }
@@ -98,20 +98,20 @@ public class TeleopOneDriver extends LinearOpMode {
                 if (grabbingBack) {
                     if (rbPressed) {
                         closeClaw = true;
-                        robot.setLiftPos(time, grabAdjust, armDownBack, wristNeutral);
+                        robot.setLiftPos(time, grabAdjust, armDownBack);
                         state = 1;
                     } else if (gamepad1.right_trigger > 0.2) {
-                        robot.setLiftPos(time, liftGrab, armDownFront, wristNeutral);
+                        robot.setLiftPos(time, liftGrab, armDownFront);
                         grabAdjust = 0;
                         grabbingBack = false;
                     }
                 } else {
                     if (rbPressed) {
                         closeClaw = true;
-                        robot.setLiftPos(time, grabAdjust, armDownFront, wristNeutral);
+                        robot.setLiftPos(time, grabAdjust, armDownFront);
                         state = 1;
                     } else if (gamepad1.right_trigger > 0.2) {
-                        robot.setLiftPos(time, liftGrab, armDownBack, wristNeutral);
+                        robot.setLiftPos(time, liftGrab, armDownBack);
                         grabAdjust = 0;
                         grabbingBack = true;
                     }
@@ -121,54 +121,63 @@ public class TeleopOneDriver extends LinearOpMode {
                     robot.claw.setPosition(clawClosed);
                     if (rbReleased) {
                         if (grabbingBack) {
-                            robot.setLiftPos(time + 0.25, grabHeight + grabAdjust, armDownBack, wristNeutral);
+                            robot.setLiftPos(time + 0.25, grabHeight + grabAdjust, armDownBack);
                         } else {
-                            robot.setLiftPos(time + 0.25, grabHeight + grabAdjust, armDownFront, wristNeutral);
+                            robot.setLiftPos(time + 0.25, grabHeight + grabAdjust, armDownFront);
                         }
                         closeClaw = false;
                     }
                 } else {
                     if (rbPressed) {
-                        robot.setLiftPos(max(robot.restTime(), time), lastLiftX, lastArmX, lastWristX);
+                        robot.setLiftPos(max(robot.restTime(), time), lastLiftX, lastArmX);
+                        restTime = robot.restTime();
                         state = 2;
                     } else if (lbPressed) {
                         robot.claw.setPosition(clawOpen);
                         if (grabbingBack) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftGrab + grabAdjust, armDownBack, wristNeutral);
+                            robot.setLiftPos(max(robot.restTime(), time), liftGrab + grabAdjust, armDownBack);
                         } else {
-                            robot.setLiftPos(max(robot.restTime(), time), liftGrab + grabAdjust, armDownFront, wristNeutral);
+                            robot.setLiftPos(max(robot.restTime(), time), liftGrab + grabAdjust, armDownFront);
                         }
                         state = 0;
                     } else if (gamepad1.left_trigger > 0.2) {
-                        robot.setLiftPos(max(robot.restTime(), time), 0, armWait, wristNeutral);
+                        robot.setLiftPos(max(robot.restTime(), time), 0, armWait);
                         waiting = true;
                         state = 2;
                     } else if (gamepad1.right_trigger > 0.2) {
                         if (aPressed) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftLow, armDropBack, wristDropBack);
+                            robot.setLiftPos(max(robot.restTime(), time), liftLow, armDropBack);
+                            restTime = robot.restTime();
                             state = 2;
                         } else if (bPressed) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftMid, armDropBack, wristDropBack);
+                            robot.setLiftPos(max(robot.restTime(), time), liftMid, armDropBack);
+                            restTime = robot.restTime();
                             state = 2;
                         } else if (yPressed) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftHigh, armDropBack, wristDropBack);
+                            robot.setLiftPos(max(robot.restTime(), time), liftHigh, armDropBack);
+                            restTime = robot.restTime();
                             state = 2;
                         } else if (xPressed) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftGround, armGroundBack, wristNeutral);
+                            robot.setLiftPos(max(robot.restTime(), time), liftGround, armGroundBack);
+                            restTime = robot.restTime();
                             state = 2;
                         }
                     } else {
                         if (aPressed) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftLow, armDropFront, wristDropFront);
+                            robot.setLiftPos(max(robot.restTime(), time), liftLow, armDropFront);
+                            restTime = robot.restTime();
                             state = 2;
                         } else if (bPressed) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftMid, armDropFront, wristDropFront);
+                            robot.setLiftPos(max(robot.restTime(), time), liftMid, armDropFront);
+                            restTime = robot.restTime();
                             state = 2;
                         } else if (yPressed) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftHigh, armDropFront, wristDropFront);
+                            robot.setLiftPos(max(robot.restTime(), time), liftHigh, armDropFront);
+                            restTime = robot.restTime();
                             state = 2;
                         } else if (xPressed) {
-                            robot.setLiftPos(max(robot.restTime(), time), liftGround, armGroundFront, wristNeutral);
+                            robot.setLiftPos(max(robot.restTime(), time), liftGround, armGroundFront);
+                            restTime = robot.restTime();
                             state = 2;
                         }
                     }
@@ -177,67 +186,90 @@ public class TeleopOneDriver extends LinearOpMode {
                 if (rbPressed && !waiting) {
                     lastLiftX = robot.liftProfile.getX(time);
                     lastArmX = robot.armProfile.getX(time);
-                    lastWristX = robot.wristProfile.getX(time);
                     robot.claw.setPosition(clawOpen);
                     state = 3;
                 } else if (gamepad1.left_trigger > 0.2) {
-                    robot.setLiftPos(time, 0, armWait, wristNeutral);
+                    robot.setLiftPos(time, 0, armWait);
                     waiting = true;
                 } else if (gamepad1.right_trigger > 0.2) {
                     if (aPressed) {
-                        robot.setLiftPos(time, liftLow, armDropBack, wristDropBack);
+                        robot.setLiftPos(time, liftLow, armDropBack);
+                        restTime = robot.restTime();
                         waiting = false;
                     } else if (bPressed) {
-                        robot.setLiftPos(time, liftMid, armDropBack, wristDropBack);
+                        robot.setLiftPos(time, liftMid, armDropBack);
+                        restTime = robot.restTime();
                         waiting = false;
                     } else if (yPressed) {
-                        robot.setLiftPos(time, liftHigh, armDropBack, wristDropBack);
+                        robot.setLiftPos(time, liftHigh, armDropBack);
+                        restTime = robot.restTime();
                         waiting = false;
                     } else if (xPressed) {
-                        robot.setLiftPos(time, liftGround, armGroundBack, wristNeutral);
+                        robot.setLiftPos(time, liftGround, armGroundBack);
+                        restTime = robot.restTime();
                         waiting = false;
                     }
                 } else {
                     if (aPressed) {
-                        robot.setLiftPos(time, liftLow, armDropFront, wristDropFront);
+                        robot.setLiftPos(time, liftLow, armDropFront);
+                        restTime = robot.restTime();
                         waiting = false;
                     } else if (bPressed) {
-                        robot.setLiftPos(time, liftMid, armDropFront, wristDropFront);
+                        robot.setLiftPos(time, liftMid, armDropFront);
+                        restTime = robot.restTime();
                         waiting = false;
                     } else if (yPressed) {
-                        robot.setLiftPos(time, liftHigh, armDropFront, wristDropFront);
+                        robot.setLiftPos(time, liftHigh, armDropFront);
+                        restTime = robot.restTime();
                         waiting = false;
                     } else if (xPressed) {
-                        robot.setLiftPos(time, liftGround, armGroundFront, wristNeutral);
+                        robot.setLiftPos(time, liftGround, armGroundFront);
+                        restTime = robot.restTime();
                         waiting = false;
                     }
                 }
             } else if (state == 3) {
                 if (gamepad1.right_trigger > 0.2 && rbPressed) {
-                    robot.setLiftPos(time, liftGrab, armDownFront, wristNeutral);
+                    robot.setLiftPos(time, liftGrab, armDownFront);
                     grabbingBack = false;
                     grabAdjust = 0;
                     state = 0;
                 } else if (rbPressed) {
-                    robot.setLiftPos(time, liftGrab, armDownBack, wristNeutral);
+                    robot.setLiftPos(time, liftGrab, armDownBack);
                     grabbingBack = true;
                     grabAdjust = 0;
                     state = 0;
                 }
             }
-            if (gamepad1.dpad_up && time > robot.restTime() && !closeClaw) {
-                grabAdjust = min(grabAdjust + grabAdjustIncrement, grabAdjustMax);
-                if (state == 0) {
-                    robot.setLiftPos(time, liftGrab + grabAdjust, robot.armProfile.getX(time), wristNeutral);
-                } else if (state == 1) {
-                    robot.setLiftPos(time, grabHeight + grabAdjust, robot.armProfile.getX(time), wristNeutral);
+            if (gamepad1.dpad_up) {
+                if (state == 0 && time > robot.restTime() && !closeClaw) {
+                    grabAdjust = min(grabAdjust + grabAdjustIncrement, grabAdjustMax);
+                    robot.setLiftPos(time, liftGrab + grabAdjust, robot.armProfile.getX(time));
+                } else if (state == 1 && time > robot.restTime() && !closeClaw) {
+                    grabAdjust = min(grabAdjust + grabAdjustIncrement, grabAdjustMax);
+                    robot.setLiftPos(time, grabHeight + grabAdjust, robot.armProfile.getX(time));
+                } else if ((state == 2 || state == 3) && time > restTime && !waiting) {
+                    double liftAdjust = min(robot.liftProfile.getX(time) + liftAdjustIncrement, liftAdjustMax);
+                    if (robot.armProfile.getX(time) < armWait) {
+                        robot.setLiftPos(time, liftAdjust, armAdjustBack(liftAdjust));
+                    } else {
+                        robot.setLiftPos(time, liftAdjust, armAdjustFront(liftAdjust));
+                    }
                 }
-            } else if (gamepad1.dpad_down && time > robot.restTime() && !closeClaw) {
-                grabAdjust = max(grabAdjust - grabAdjustIncrement, 0);
-                if (state == 0) {
-                    robot.setLiftPos(time, liftGrab + grabAdjust, robot.armProfile.getX(time), wristNeutral);
-                } else if (state == 1) {
-                    robot.setLiftPos(time, grabHeight + grabAdjust, robot.armProfile.getX(time), wristNeutral);
+            } else if (gamepad1.dpad_down) {
+                if (state == 0 && time > robot.restTime() && !closeClaw) {
+                    grabAdjust = max(grabAdjust - grabAdjustIncrement, 0);
+                    robot.setLiftPos(time, liftGrab + grabAdjust, robot.armProfile.getX(time));
+                } else if (state == 1 && time > robot.restTime() && !closeClaw) {
+                    grabAdjust = max(grabAdjust - grabAdjustIncrement, 0);
+                    robot.setLiftPos(time, grabHeight + grabAdjust, robot.armProfile.getX(time));
+                } else if ((state == 2 || state == 3) && time > restTime && !waiting) {
+                    double liftAdjust = max(robot.liftProfile.getX(time) - liftAdjustIncrement, liftGround);
+                    if (robot.armProfile.getX(time) < armWait) {
+                        robot.setLiftPos(time, liftAdjust, armAdjustBack(liftAdjust));
+                    } else {
+                        robot.setLiftPos(time, liftAdjust, armAdjustFront(liftAdjust));
+                    }
                 }
             }
             robot.update(time);
